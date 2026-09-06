@@ -1,0 +1,38 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "L'Atelier de la Séduction",
+      "hasCanvas": false,
+      "bodyTextLen": 2542,
+      "bodyTextHash": "ace9175477daa39f37f9ce61e4cf0925ab077826ec4838e28a43e1e3bccfb1e5",
+      "bodyTextPrefix": "L'ATELIER DE LA SÉDUCTION BOUTIQUE L'ATELIER CONTACT WhatsApp AB",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "L'Atelier de la Séduction",
+      "hasCanvas": false,
+      "bodyTextLen": 2454,
+      "bodyTextHash": "5c4e068e3546b193aa043bf426c061abce11c04e0b1b73dc666a6f2445fb089a",
+      "bodyTextPrefix": "ABIDJAN · RIVIERA-BONOUMIN L'Atelier de la Séduction Une pépite ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": false,
+  "baselineReasons": []
+}

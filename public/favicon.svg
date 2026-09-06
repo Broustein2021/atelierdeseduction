@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="L'Atelier de la Séduction">
+  <rect width="64" height="64" rx="12" fill="#7A2E3A"/>
+  <path fill="#F7F1EC" fill-rule="evenodd" d="M18 18 24.4 46h-4.6l-1.4-5.8H10.2L8.8 46H4.2L14 18h4ZM11.2 36.4h6.2L14.2 24.6h-.1l-2.9 11.8Z"/>
+  <path fill="#C9A09A" d="M32 21s-5 8.4-5 13.4c0 3.6 2.2 6.2 5 6.2s5-2.6 5-6.2c0-5-5-13.4-5-13.4z"/>
+  <path fill="none" stroke="#F7F1EC" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round" d="M53.8 26.4c.2-3.6-2.8-6.2-7-6.2-4 0-6.8 2.3-6.8 5.6 0 3 2.2 4.4 6.4 5.8 4.6 1.5 8 3.4 8 7.8 0 4.6-4 7.4-9 7.4-4.8 0-8.2-2.7-8.6-7"/>
+</svg>
