@@ -4,11 +4,11 @@ import { ProductCard } from "@/components/product/ProductCard";
 import {
   categories,
   colors,
-  products,
   type CategoryId,
   type ColorId,
 } from "@/data/products";
 import { cn } from "@/lib/utils";
+import { getProducts, type ProductWithMedia } from "@/lib/products-server";
 
 type Search = {
   cat?: CategoryId;
@@ -31,6 +31,10 @@ export const Route = createFileRoute("/boutique")({
       : undefined,
     nouveau: truthyParam(s.nouveau),
   }),
+  loader: async () => {
+    const products = await getProducts();
+    return { products };
+  },
   component: BoutiquePage,
 });
 
@@ -62,6 +66,7 @@ function Chip({
 function BoutiquePage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
+  const { products } = Route.useLoaderData();
   const [size, setSize] = useState<string>("all");
 
   const setSearch = (patch: Partial<Search>) => {

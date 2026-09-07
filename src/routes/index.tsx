@@ -4,10 +4,16 @@ import { Logo, Monogram } from "@/components/brand/Logo";
 import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
-import { featuredProducts } from "@/data/products";
 import { generalInquiryText, site, waUrl } from "@/data/site";
+import { getProducts } from "@/lib/products-server";
 
-export const Route = createFileRoute("/")({ component: Home });
+export const Route = createFileRoute("/")({
+  loader: async () => {
+    const products = await getProducts();
+    return { products };
+  },
+  component: Home,
+});
 
 const marquee = [
   "Photos sans retouches",
@@ -19,7 +25,8 @@ const marquee = [
 ];
 
 function Home() {
-  const featured = featuredProducts();
+  const { products } = Route.useLoaderData();
+  const featured = products.filter((p) => p.featured);
   return (
     <main>
       <section className="relative min-h-[88svh] overflow-hidden bg-ink">

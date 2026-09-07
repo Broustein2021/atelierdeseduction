@@ -6,16 +6,26 @@ import {
   categoryLabel,
   colorLabel,
   colors,
-  getProduct,
-  relatedProducts,
 } from "@/data/products";
+import { getProductBySlug, getProducts, type ProductWithMedia } from "@/lib/products-server";
 import { formatCfa, cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/produit/$slug")({
-  loader: ({ params }) => {
-    const product = getProduct(params.slug);
+  loader: async ({ params }) => {
+    const [product, all] = await Promise.all([
+      getProductBySlug({ data: params.slug }),
+      getProducts(),
+    ]);
     if (!product) throw notFound();
-    return { product, related: relatedProducts(product) };
+    const related = [...all]
+      .filter((p) => p.id !== product.id)
+      .sort((a, b) => {
+        const aSame = a.category === product.category ? 0 : 1;
+        const bSame = b.category === product.category ? 0 : 1;
+        return aSame - bSame;
+      })
+      .slice(0, 4);
+    return { product, related };
   },
   component: ProductPage,
 });
@@ -67,6 +77,30 @@ function ProductPage() {
                     className="aspect-square w-full object-cover"
                   />
                 </button>
+              ))}
+            </div>
+          ) : null}
+
+          {product.videos.length > 0 ? (
+            <div className="mt-4 space-y-3">
+              <p className="text-[11px] tracking-[0.16em] uppercase text-muted">
+                En vidéo
+              </p>
+              {product.videos.map((src, i) => (
+                <div
+                  key={src}
+                  className="overflow-hidden rounded-xl bg-ink"
+                >
+                  <video
+                    src={src}
+                    controls
+                    preload="metadata"
+                    className="aspect-video w-full"
+                  >
+                    <source src={src} />
+                    Votre navigateur ne supporte pas la lecture de vidéos.
+                  </video>
+                </div>
               ))}
             </div>
           ) : null}

@@ -14,7 +14,12 @@ import { Route as AProposRouteImport } from './routes/a-propos'
 import { Route as BoutiqueRouteImport } from './routes/boutique'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as GuideTaillesRouteImport } from './routes/guide-tailles'
+import { Route as AdminLayoutRouteImport } from './routes/admin/_layout'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as ProduitSlugRouteImport } from './routes/produit.$slug'
+import { Route as AdminLayoutIndexRouteImport } from './routes/admin/_layout/index'
+import { Route as AdminLayoutProduitsSlugRouteImport } from './routes/admin/_layout/produits/$slug'
+import { Route as AdminLayoutProduitsNewRouteImport } from './routes/admin/_layout/produits/new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,10 +46,35 @@ const GuideTaillesRoute = GuideTaillesRouteImport.update({
   path: '/guide-tailles',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLayoutRoute = AdminLayoutRouteImport.update({
+  id: '/admin/_layout',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProduitSlugRoute = ProduitSlugRouteImport.update({
   id: '/produit/$slug',
   path: '/produit/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLayoutIndexRoute = AdminLayoutIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminLayoutRoute,
+} as any)
+const AdminLayoutProduitsSlugRoute = AdminLayoutProduitsSlugRouteImport.update({
+  id: '/produits/$slug',
+  path: '/produits/$slug',
+  getParentRoute: () => AdminLayoutRoute,
+} as any)
+const AdminLayoutProduitsNewRoute = AdminLayoutProduitsNewRouteImport.update({
+  id: '/produits/new',
+  path: '/produits/new',
+  getParentRoute: () => AdminLayoutRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -53,7 +83,12 @@ export interface FileRoutesByFullPath {
   '/boutique': typeof BoutiqueRoute
   '/contact': typeof ContactRoute
   '/guide-tailles': typeof GuideTaillesRoute
+  '/admin': typeof AdminLayoutRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
+  '/admin/': typeof AdminLayoutIndexRoute
+  '/admin/produits/$slug': typeof AdminLayoutProduitsSlugRoute
+  '/admin/produits/new': typeof AdminLayoutProduitsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,7 +96,11 @@ export interface FileRoutesByTo {
   '/boutique': typeof BoutiqueRoute
   '/contact': typeof ContactRoute
   '/guide-tailles': typeof GuideTaillesRoute
+  '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
+  '/admin': typeof AdminLayoutIndexRoute
+  '/admin/produits/$slug': typeof AdminLayoutProduitsSlugRoute
+  '/admin/produits/new': typeof AdminLayoutProduitsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,7 +109,12 @@ export interface FileRoutesById {
   '/boutique': typeof BoutiqueRoute
   '/contact': typeof ContactRoute
   '/guide-tailles': typeof GuideTaillesRoute
+  '/admin/_layout': typeof AdminLayoutRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
+  '/admin/_layout/': typeof AdminLayoutIndexRoute
+  '/admin/_layout/produits/$slug': typeof AdminLayoutProduitsSlugRoute
+  '/admin/_layout/produits/new': typeof AdminLayoutProduitsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -80,7 +124,12 @@ export interface FileRouteTypes {
     | '/boutique'
     | '/contact'
     | '/guide-tailles'
+    | '/admin'
+    | '/admin/login'
     | '/produit/$slug'
+    | '/admin/'
+    | '/admin/produits/$slug'
+    | '/admin/produits/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -88,7 +137,11 @@ export interface FileRouteTypes {
     | '/boutique'
     | '/contact'
     | '/guide-tailles'
+    | '/admin/login'
     | '/produit/$slug'
+    | '/admin'
+    | '/admin/produits/$slug'
+    | '/admin/produits/new'
   id:
     | '__root__'
     | '/'
@@ -96,7 +149,12 @@ export interface FileRouteTypes {
     | '/boutique'
     | '/contact'
     | '/guide-tailles'
+    | '/admin/_layout'
+    | '/admin/login'
     | '/produit/$slug'
+    | '/admin/_layout/'
+    | '/admin/_layout/produits/$slug'
+    | '/admin/_layout/produits/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -105,6 +163,8 @@ export interface RootRouteChildren {
   BoutiqueRoute: typeof BoutiqueRoute
   ContactRoute: typeof ContactRoute
   GuideTaillesRoute: typeof GuideTaillesRoute
+  AdminLayoutRoute: typeof AdminLayoutRouteWithChildren
+  AdminLoginRoute: typeof AdminLoginRoute
   ProduitSlugRoute: typeof ProduitSlugRoute
 }
 
@@ -145,6 +205,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuideTaillesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/_layout': {
+      id: '/admin/_layout'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produit/$slug': {
       id: '/produit/$slug'
       path: '/produit/$slug'
@@ -152,8 +226,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProduitSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/_layout/': {
+      id: '/admin/_layout/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminLayoutIndexRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
+    '/admin/_layout/produits/$slug': {
+      id: '/admin/_layout/produits/$slug'
+      path: '/produits/$slug'
+      fullPath: '/admin/produits/$slug'
+      preLoaderRoute: typeof AdminLayoutProduitsSlugRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
+    '/admin/_layout/produits/new': {
+      id: '/admin/_layout/produits/new'
+      path: '/produits/new'
+      fullPath: '/admin/produits/new'
+      preLoaderRoute: typeof AdminLayoutProduitsNewRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
   }
 }
+
+interface AdminLayoutRouteChildren {
+  AdminLayoutIndexRoute: typeof AdminLayoutIndexRoute
+  AdminLayoutProduitsSlugRoute: typeof AdminLayoutProduitsSlugRoute
+  AdminLayoutProduitsNewRoute: typeof AdminLayoutProduitsNewRoute
+}
+
+const AdminLayoutRouteChildren: AdminLayoutRouteChildren = {
+  AdminLayoutIndexRoute: AdminLayoutIndexRoute,
+  AdminLayoutProduitsSlugRoute: AdminLayoutProduitsSlugRoute,
+  AdminLayoutProduitsNewRoute: AdminLayoutProduitsNewRoute,
+}
+
+const AdminLayoutRouteWithChildren = AdminLayoutRoute._addFileChildren(
+  AdminLayoutRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -161,6 +272,8 @@ const rootRouteChildren: RootRouteChildren = {
   BoutiqueRoute: BoutiqueRoute,
   ContactRoute: ContactRoute,
   GuideTaillesRoute: GuideTaillesRoute,
+  AdminLayoutRoute: AdminLayoutRouteWithChildren,
+  AdminLoginRoute: AdminLoginRoute,
   ProduitSlugRoute: ProduitSlugRoute,
 }
 export const routeTree = rootRouteImport

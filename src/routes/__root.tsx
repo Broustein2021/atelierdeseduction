@@ -2,13 +2,14 @@ import {
   createRootRoute,
   HeadContent,
   Scripts,
+  useRouterState,
+  Outlet,
 } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { Shell } from "@/components/layout/Shell";
 import { NotFound } from "@/components/not-found";
 import appCss from "../styles.css?url";
-
 const APP_NAME = "L'Atelier de la Séduction";
 
 export const Route = createRootRoute({
@@ -49,6 +50,8 @@ export const Route = createRootRoute({
 });
 
 function Root() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isAdmin = pathname.startsWith("/admin");
   return (
     <html lang="fr" suppressHydrationWarning className="antialiased">
       <head>
@@ -57,7 +60,7 @@ function Root() {
       <body className="min-h-svh bg-cream font-sans text-ink">
         <PreviewHostBridge />
         <AuthProvider>
-          <Shell />
+          {isAdmin ? <Outlet /> : <Shell />}
         </AuthProvider>
         <Scripts />
       </body>
