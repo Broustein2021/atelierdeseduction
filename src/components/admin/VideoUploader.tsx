@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Film, Loader2, Trash2, UploadCloud } from "lucide-react";
 import { resolveMediaPath } from "@/lib/products";
+import { createAdminUploadUrl, deleteAdminMedia, uploadToSignedUrl } from "@/lib/admin-upload";
 
 const MAX_VIDEOS = 3;
 const BUCKET = "product-videos";
@@ -54,26 +55,21 @@ export function VideoUploader({
 
       for (const file of fileList) {
         setCurrentFile(file.name);
-        const ext = file.name.split(".").pop() || "mp4";
-        const path = `${productId}/${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2, 8)}.${ext}`;
-
-        const { error: uploadErr } = await supabase.storage
-          .from(BUCKET)
-          .upload(path, file, {
-            contentType: file.type,
-            cacheControl: "3600",
-          });
-
-        if (uploadErr) {
-          setError(`Erreur d'upload : ${uploadErr.message}`);
+        try {
+          const { signedUrl, path: storagePath } = await createAdminUploadUrl(
+            BUCKET,
+            productId,
+            file.name,
+            file.type,
+          );
+          await uploadToSignedUrl(signedUrl, file);
+          uploaded.push(storagePath);
+          setProgress((prev) => prev + Math.round(100 / fileList.length));
+        } catch (e) {
+          setError(e instanceof Error ? e.message : `Erreur d'upload : ${e}`);
           setUploading(false);
           return;
         }
-
-        uploaded.push(`${BUCKET}/${path}`);
-        setProgress((prev) => prev + Math.round(100 / fileList.length));
       }
 
       onChange([...videos, ...uploaded].slice(0, MAX_VIDEOS));
@@ -88,9 +84,9 @@ export function VideoUploader({
     async (storagePath: string) => {
       onChange(videos.filter((v) => v !== storagePath));
       const path = storagePath.replace(`${BUCKET}/`, "");
-      void supabase.storage.from(BUCKET).remove([path]);
+      void deleteAdminMedia(BUCKET, path).catch(() => {});
     },
-    [videos, onChange, supabase],
+    [videos, onChange],
   );
 
   return (

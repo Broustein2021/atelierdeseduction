@@ -5,6 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { ImagePlus, Loader2, Trash2, X } from "lucide-react";
 import { resolveMediaPath } from "@/lib/products";
 import { cn } from "@/lib/utils";
+import { createAdminUploadUrl, deleteAdminMedia, uploadToSignedUrl } from "@/lib/admin-upload";
 
 const MAX_IMAGES = 10;
 const BUCKET = "product-images";
@@ -52,28 +53,23 @@ export function ImageUploader({
       const uploaded: { storagePath: string; isPrimary: boolean }[] = [];
 
       for (const file of fileList) {
-        const ext = file.name.split(".").pop() || "jpg";
-        const path = `${productId}/${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2, 8)}.${ext}`;
-
-        const { error: uploadErr } = await supabase.storage
-          .from(BUCKET)
-          .upload(path, file, {
-            contentType: file.type,
-            cacheControl: "3600",
+        try {
+          const { signedUrl, path: storagePath } = await createAdminUploadUrl(
+            BUCKET,
+            productId,
+            file.name,
+            file.type,
+          );
+          await uploadToSignedUrl(signedUrl, file);
+          uploaded.push({
+            storagePath,
+            isPrimary: images.length === 0,
           });
-
-        if (uploadErr) {
-          setError(`Erreur d'upload : ${uploadErr.message}`);
+        } catch (e) {
+          setError(e instanceof Error ? e.message : `Erreur d'upload : ${e}`);
           setUploading(false);
           return;
         }
-
-        uploaded.push({
-          storagePath: `${BUCKET}/${path}`,
-          isPrimary: images.length === 0,
-        });
         done += 1;
         setProgress(Math.round((done / total) * 100));
       }
@@ -97,7 +93,7 @@ export function ImageUploader({
 
       // Delete from storage (best-effort, non-blocking)
       const path = storagePath.replace(`${BUCKET}/`, "");
-      void supabase.storage.from(BUCKET).remove([path]);
+      void deleteAdminMedia(BUCKET, path).catch(() => {});
     },
     [images, onChange, supabase],
   );

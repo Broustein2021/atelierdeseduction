@@ -18,6 +18,7 @@ import { Route as AdminLayoutRouteImport } from './routes/admin/_layout'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as ProduitSlugRouteImport } from './routes/produit.$slug'
 import { Route as AdminLayoutIndexRouteImport } from './routes/admin/_layout/index'
+import { Route as ApiAdminUploadRouteImport } from './routes/api/admin/upload'
 import { Route as AdminLayoutProduitsSlugRouteImport } from './routes/admin/_layout/produits/$slug'
 import { Route as AdminLayoutProduitsNewRouteImport } from './routes/admin/_layout/produits/new'
 
@@ -66,6 +67,11 @@ const AdminLayoutIndexRoute = AdminLayoutIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminLayoutRoute,
 } as any)
+const ApiAdminUploadRoute = ApiAdminUploadRouteImport.update({
+  id: '/api/admin/upload',
+  path: '/api/admin/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLayoutProduitsSlugRoute = AdminLayoutProduitsSlugRouteImport.update({
   id: '/produits/$slug',
   path: '/produits/$slug',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminLayoutRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
+  '/api/admin/upload': typeof ApiAdminUploadRoute
   '/admin/': typeof AdminLayoutIndexRoute
   '/admin/produits/$slug': typeof AdminLayoutProduitsSlugRoute
   '/admin/produits/new': typeof AdminLayoutProduitsNewRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/guide-tailles': typeof GuideTaillesRoute
   '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
+  '/api/admin/upload': typeof ApiAdminUploadRoute
   '/admin': typeof AdminLayoutIndexRoute
   '/admin/produits/$slug': typeof AdminLayoutProduitsSlugRoute
   '/admin/produits/new': typeof AdminLayoutProduitsNewRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/admin/_layout': typeof AdminLayoutRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
+  '/api/admin/upload': typeof ApiAdminUploadRoute
   '/admin/_layout/': typeof AdminLayoutIndexRoute
   '/admin/_layout/produits/$slug': typeof AdminLayoutProduitsSlugRoute
   '/admin/_layout/produits/new': typeof AdminLayoutProduitsNewRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin/login'
     | '/produit/$slug'
+    | '/api/admin/upload'
     | '/admin/'
     | '/admin/produits/$slug'
     | '/admin/produits/new'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/guide-tailles'
     | '/admin/login'
     | '/produit/$slug'
+    | '/api/admin/upload'
     | '/admin'
     | '/admin/produits/$slug'
     | '/admin/produits/new'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/admin/_layout'
     | '/admin/login'
     | '/produit/$slug'
+    | '/api/admin/upload'
     | '/admin/_layout/'
     | '/admin/_layout/produits/$slug'
     | '/admin/_layout/produits/new'
@@ -166,6 +178,7 @@ export interface RootRouteChildren {
   AdminLayoutRoute: typeof AdminLayoutRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
   ProduitSlugRoute: typeof ProduitSlugRoute
+  ApiAdminUploadRoute: typeof ApiAdminUploadRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -233,6 +246,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLayoutIndexRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
+    '/api/admin/upload': {
+      id: '/api/admin/upload'
+      path: '/api/admin/upload'
+      fullPath: '/api/admin/upload'
+      preLoaderRoute: typeof ApiAdminUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/_layout/produits/$slug': {
       id: '/admin/_layout/produits/$slug'
       path: '/produits/$slug'
@@ -275,6 +295,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLayoutRoute: AdminLayoutRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
   ProduitSlugRoute: ProduitSlugRoute,
+  ApiAdminUploadRoute: ApiAdminUploadRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
