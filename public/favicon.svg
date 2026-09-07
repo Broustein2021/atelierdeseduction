@@ -1,6 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="L'Atelier de la Séduction">
-  <rect width="64" height="64" rx="14" fill="#7A2E3A"/>
-  <path d="M27 9 L18 43 M27 9 L36 43 M20.5 30.5 H32.5 M15.5 43 H21 M33.5 43 H39" fill="none" stroke="#F7F1EC" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M47 15 C48.5 12.4 53 12 54.8 13.9 C56.6 15.8 56.2 18.7 54 20.1 C49.6 23 43.5 25.2 42.7 28.8 C41.9 32.6 45.6 36.4 50.4 36.4 C53.6 36.4 56.6 34.4 57 31.2" fill="none" stroke="#F7F1EC" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M27 4.5 L28.9 8 L27 11.5 L25.1 8 Z" fill="#C9A09A"/>
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="22%" r="90%">
+      <stop offset="0%" stop-color="#8A3A48"/>
+      <stop offset="60%" stop-color="#7A2E3A"/>
+      <stop offset="100%" stop-color="#5C222C"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E8C79A"/>
+      <stop offset="100%" stop-color="#C9A09A"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="url(#bg)"/>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="13" fill="none" stroke="url(#gold)" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M27 10 L18 42 M27 10 L36 42 M21 30 H32 M14.5 42 H20 M34 42 H39" fill="none" stroke="#F7F1EC" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M47 15 C48.6 12.3 53.4 11.9 55.4 13.9 C57.4 15.9 56.8 18.9 54.4 20.3 C49.6 23.4 43.2 25.6 42.4 29.4 C41.6 33.2 45.4 37 50.4 37 C54.8 37 57.8 34.6 58.2 31.4" fill="none" stroke="#F7F1EC" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M27 5.2 L29.2 9.6 L27 14 L24.8 9.6 Z" fill="url(#gold)"/>
 </svg>
