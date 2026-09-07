@@ -9,20 +9,31 @@ export function Monogram({ className }: { className?: string }) {
       aria-hidden="true"
     >
       <path
-        d="M22 8 L26 16 L22 16.8 L30 44 H24.2 L22.4 36.6 H11.6 L9.8 44 H4 L16.2 8 H22 Z M12.9 31.6 H21.1 L17 16.2 H16.9 L12.9 31.6 Z"
+        d="M38 7 L23 45 M38 7 L50 45 M27.5 33 H43 M20 45 H26 M47 45 H53"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M38 2.2 L40.4 6.6 L38 11 L35.6 6.6 Z"
         fill="currentColor"
       />
       <path
-        d="M36 14 C36 14 29.5 24.5 29.5 31.2 C29.5 35.8 32.4 38.8 36 38.8 C39.6 38.8 42.5 35.8 42.5 31.2 C42.5 24.5 36 14 36 14 Z"
-        fill="currentColor"
+        d="M65 11 C67 7.5 73 7 75.5 9.5 C78 12 77.5 15.5 74.5 17.5 C68.5 22 59.5 25 58.5 30 C57.5 35.5 62.5 40 69 40 C73.5 40 77.5 37 78 33.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
-        d="M22 4.2 L24.4 8.6 L22 13 L19.6 8.6 Z"
-        fill="currentColor"
-      />
-      <path
-        d="M58 16.2 C64.6 16.2 69 19.8 69 25.2 C69 29.2 66.4 31.6 61.8 32.8 L69.6 44 H63.2 L56.2 33.4 H52.4 V44 H47 V8.4 H58 Z M52.4 16.2 V28.4 H57.4 C61.1 28.4 63.4 27 63.4 24.2 C63.4 21.4 61.1 16.2 57.2 16.2 H52.4 Z"
-        fill="currentColor"
+        d="M22 47.5 H74"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
       />
     </svg>
   );
