@@ -1,4 +1,5 @@
 node_modules/
+.vercel/output/
 .project_id
 .github_repo
 .env

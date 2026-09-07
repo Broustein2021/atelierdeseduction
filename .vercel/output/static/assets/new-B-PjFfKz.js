@@ -1,1 +1,0 @@
-import{i as e}from"./utils-BKNfgrbz.js";import{t}from"./ProductForm-V00-fGwU.js";var n=e();function r(){return(0,n.jsx)(t,{})}export{r as component};
