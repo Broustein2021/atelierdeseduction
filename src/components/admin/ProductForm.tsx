@@ -105,8 +105,8 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
     if (!form.name.trim()) return "Le nom est requis.";
     if (!form.slug.trim()) return "Le slug est requis.";
     const price = Number(form.price);
-    if (!price || price <= 0) return "Le prix est requis et doit Ãªtre > 0.";
-    if (form.colors.length === 0) return "SÃ©lectionnez au moins une couleur.";
+    if (!price || price <= 0) return "Le prix est requis et doit être > 0.";
+    if (form.colors.length === 0) return "Sélectionnez au moins une couleur.";
     return "";
   };
 
@@ -254,7 +254,7 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
     if (!product) return;
     if (
       !window.confirm(
-        `Supprimer dÃ©finitivement Â« ${product.name} Â» ? Cette action est irrÃ©versible.`,
+        `Supprimer définitivement « ${product.name} » ? Cette action est irréversible.`,
       )
     )
       return;
@@ -271,7 +271,7 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
   };
 
   if (loading) {
-    return <p className="py-10 text-center text-muted">Chargementâ€¦</p>;
+    return <p className="py-10 text-center text-muted">Chargement…</p>;
   }
 
   return (
@@ -309,7 +309,7 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
                 placeholder="ensemble-dentelle-ivoire"
               />
             </Field>
-            <Field label="RÃ©fÃ©rence">
+            <Field label="Référence">
               <input
                 type="text"
                 value={form.ref}
@@ -330,7 +330,7 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
               placeholder="18000"
             />
           </Field>
-          <Field label="CatÃ©gorie">
+          <Field label="Catégorie">
             <select
               value={form.category}
               onChange={(e) => set({ category: e.target.value })}
@@ -343,7 +343,7 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
               ))}
             </select>
           </Field>
-          <Field label="Description courte (affichÃ©e sur la carte)">
+          <Field label="Description courte (affichée sur la carte)">
             <textarea
               value={form.short}
               onChange={(e) => set({ short: e.target.value })}
@@ -351,22 +351,22 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
               placeholder="Courte phrase accrocheuse"
             />
           </Field>
-          <Field label="Description complÃ¨te">
+          <Field label="Description complète">
             <textarea
               value={form.description}
               onChange={(e) => set({ description: e.target.value })}
               className="min-h-28 w-full rounded-md border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-burgundy"
-              placeholder="Description dÃ©taillÃ©e de la piÃ¨ce"
+              placeholder="Description détaillée de la pièce"
             />
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="MatiÃ¨re">
+            <Field label="Matière">
               <input
                 type="text"
                 value={form.material}
                 onChange={(e) => set({ material: e.target.value })}
                 className={inputCls}
-                placeholder="Dentelle, tulle, satinâ€¦"
+                placeholder="Dentelle, tulle, satin…"
               />
             </Field>
             <Field label="Entretien">
@@ -375,7 +375,7 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
                 value={form.care}
                 onChange={(e) => set({ care: e.target.value })}
                 className={inputCls}
-                placeholder="Lavage Ã  la mainâ€¦"
+                placeholder="Lavage à la main…"
               />
             </Field>
           </div>
@@ -437,7 +437,7 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
 
         <Section
           title="Images"
-          hint="Photos de l'article â€” couvrez la piÃ¨ce sous tous les angles."
+          hint="Photos de l'article — couvrez la pièce sous tous les angles."
         >
           <ImageUploader
             supabase={supabase}
@@ -448,8 +448,8 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
         </Section>
 
         <Section
-          title="VidÃ©os"
-          hint="Montrez l'article en mouvement. VidÃ©o 50 Mo max, MP4 conseillÃ©."
+          title="Vidéos"
+          hint="Montrez l'article en mouvement. Vidéo 50 Mo max, MP4 conseillé."
         >
           <VideoUploader
             supabase={supabase}

@@ -3,7 +3,19 @@ import { Button } from "@/components/ui/button";
 import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import { generalInquiryText, site, waUrl } from "@/data/site";
 
-export const Route = createFileRoute("/a-propos")({ component: AboutPage });
+export const Route = createFileRoute("/a-propos")({
+  head: () => ({
+    meta: [
+      { title: "À propos — L'Atelier de la Séduction, Riviera-Bonoumin" },
+      {
+        name: "description",
+        content:
+          "L'histoire de L'Atelier de la Séduction : une boutique de lingerie à Riviera-Bonoumin, Abidjan, où chaque pièce est choisie à la main, sans retouches.",
+      },
+    ],
+  }),
+  component: AboutPage,
+});
 
 function AboutPage() {
   return (

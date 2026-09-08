@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://atelierdeseduction.vercel.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/boutique</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/guide-tailles</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/a-propos</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/produit/ensemble-pepite-rose</loc><lastmod>2026-09-07</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/produit/ensemble-dentelle-ivoire</loc><lastmod>2026-09-07</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/produit/ensemble-dentelle-rose</loc><lastmod>2026-09-07</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/produit/camisole-soie-bordeaux</loc><lastmod>2026-09-07</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/produit/nuisette-soie-ivoire</loc><lastmod>2026-09-07</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/produit/body-dentelle-noir</loc><lastmod>2026-09-07</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/produit/ensemble-nude-cachemire</loc><lastmod>2026-09-07</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/produit/nuisette-satin-bordeaux</loc><lastmod>2026-09-07</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/produit/soutien-gorge-dentelle-ivoire</loc><lastmod>2026-09-07</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/produit/ensemble-trois-pieces-nuit</loc><lastmod>2026-09-07</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://atelierdeseduction.vercel.app/produit/peignoir-soie-ivoire</loc><lastmod>2026-09-07</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+</urlset>

@@ -12,6 +12,16 @@ export const Route = createFileRoute("/")({
     const products = await getProducts();
     return { products };
   },
+  head: () => ({
+    meta: [
+      { title: "L'Atelier de la Séduction — Lingerie féminine à Abidjan" },
+      {
+        name: "description",
+        content:
+          "Boutique de lingerie et nuisettes à Abidjan, Riviera-Bonoumin. Pièces sans retouches, sélectionnées à la main. Commandez sur WhatsApp, livraison à Abidjan.",
+      },
+    ],
+  }),
   component: Home,
 });
 

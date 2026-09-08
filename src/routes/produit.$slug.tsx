@@ -10,6 +10,15 @@ import {
 import { getProductBySlug, getProducts, type ProductWithMedia } from "@/lib/products-server";
 import { formatCfa, cn } from "@/lib/utils";
 
+const SITE_URL = "https://atelierdeseduction.vercel.app";
+const SITE_NAME = "L'Atelier de la Séduction";
+
+function toAbsoluteImage(src: string): string {
+  if (src.startsWith("http")) return src;
+  if (src.startsWith("/")) return `${SITE_URL}${src}`;
+  return `${SITE_URL}/${src}`;
+}
+
 export const Route = createFileRoute("/produit/$slug")({
   loader: async ({ params }) => {
     const [product, all] = await Promise.all([
@@ -26,6 +35,43 @@ export const Route = createFileRoute("/produit/$slug")({
       })
       .slice(0, 4);
     return { product, related };
+  },
+  head: ({ loaderData }) => {
+    const product = loaderData?.product;
+    if (!product) return {};
+    const title = `${product.name} — L'Atelier de la Séduction`;
+    const description =
+      product.short ||
+      `${product.name}, ${categoryLabel[product.category] ?? "pièce de lingerie"} à ${formatCfa(product.price)}. Photos sans retouches, commande sur WhatsApp.`;
+    const image = product.images[0];
+    const productUrl = `${SITE_URL}/produit/${product.slug}`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: product.name,
+            description,
+            image: [image ? toAbsoluteImage(image) : SITE_URL + "/og.jpg"],
+            sku: product.ref,
+            brand: { "@type": "Brand", name: SITE_NAME },
+            offers: {
+              "@type": "Offer",
+              price: product.price,
+              priceCurrency: "XOF",
+              availability: "https://schema.org/InStock",
+              url: productUrl,
+            },
+          }),
+        },
+      ],
+    };
   },
   component: ProductPage,
 });

@@ -4,7 +4,19 @@ import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import { Button } from "@/components/ui/button";
 import { generalInquiryText, site, waUrl } from "@/data/site";
 
-export const Route = createFileRoute("/contact")({ component: ContactPage });
+export const Route = createFileRoute("/contact")({
+  head: () => ({
+    meta: [
+      { title: "Contact & boutique — L'Atelier de la Séduction, Abidjan" },
+      {
+        name: "description",
+        content:
+          "Contactez L'Atelier de la Séduction sur WhatsApp ou au 01 40 24 22 21. Boutique à la Résidence RYAN, Riviera-Bonoumin, Abidjan. Voir les horaires et l'itinéraire.",
+      },
+    ],
+  }),
+  component: ContactPage,
+});
 
 function ContactPage() {
   return (

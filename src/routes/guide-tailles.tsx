@@ -3,6 +3,16 @@ import { WhatsAppCta } from "@/components/product/WhatsAppCta";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/guide-tailles")({
+  head: () => ({
+    meta: [
+      { title: "Guide des tailles — L'Atelier de la Séduction" },
+      {
+        name: "description",
+        content:
+          "Correspondance des tailles S à XXL pour la lingerie et les nuisettes : tour de poitrine, taille et hanches en centimètres.",
+      },
+    ],
+  }),
   component: SizeGuidePage,
 });
 

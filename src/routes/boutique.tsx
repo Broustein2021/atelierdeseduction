@@ -35,6 +35,16 @@ export const Route = createFileRoute("/boutique")({
     const products = await getProducts();
     return { products };
   },
+  head: () => ({
+    meta: [
+      { title: "La boutique — L'Atelier de la Séduction, Abidjan" },
+      {
+        name: "description",
+        content:
+          "Ensembles, nuisettes, bodies et dessous en dentelle et soie à Abidjan. Photos sans retouches, commandes sur WhatsApp et livraison à Abidjan.",
+      },
+    ],
+  }),
   component: BoutiquePage,
 });
 
