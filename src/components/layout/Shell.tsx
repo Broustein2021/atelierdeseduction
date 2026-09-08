@@ -5,7 +5,7 @@ import { WhatsAppFloat } from "@/components/layout/WhatsAppFloat";
 
 export function Shell() {
   return (
-    <div className="flex min-h-svh flex-col overflow-x-hidden bg-cream text-ink">
+    <div className="flex min-h-svh flex-col overflow-x-clip bg-cream text-ink">
       <Header />
       <div className="flex-1 pb-20 sm:pb-8">
         <Outlet />
