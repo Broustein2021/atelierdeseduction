@@ -48,7 +48,7 @@ function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/45 to-ink/25" />
         <div className="relative mx-auto flex min-h-[88svh] max-w-6xl flex-col justify-end px-4 pb-12 pt-24 sm:px-6 sm:pb-16">
           <div className="animate-rise max-w-xl text-paper">
-            <Monogram className="h-14 w-24 text-paper" />
+            <Monogram className="h-14 text-paper" />
             <p className="mt-5 text-[11px] tracking-[0.28em] uppercase text-rose">
               Abidjan · Riviera-Bonoumin
             </p>
