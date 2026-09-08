@@ -8,7 +8,7 @@ export function Monogram({ className }: { className?: string }) {
       alt=""
       width={1000}
       height={993}
-      className={cn("w-auto object-contain", className)}
+      className={cn("w-auto object-contain rounded-[28%]", className)}
       draggable={false}
     />
   );
