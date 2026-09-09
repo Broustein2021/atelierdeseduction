@@ -33,7 +33,7 @@ export function Logo({
       )}
       aria-label="L'Atelier de la Séduction — accueil"
     >
-      <Monogram className={stacked ? "h-12" : "h-9"} />
+      <Monogram className={stacked ? "h-12" : "h-10"} />
       <span
         className={cn(
           "font-display tracking-[0.18em] uppercase text-ink",

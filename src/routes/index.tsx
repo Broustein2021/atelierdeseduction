@@ -41,7 +41,7 @@ function Home() {
     <main>
       <section className="relative min-h-[88svh] overflow-hidden bg-ink">
         <img
-          src="/images/brand/boutique.jpg"
+          src="/images/brand/hero.jpg"
           alt="L'Atelier de la Séduction, boutique Riviera-Bonoumin"
           className="absolute inset-0 h-full w-full object-cover object-[center_20%]"
         />
