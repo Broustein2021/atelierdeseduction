@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Link, Navigate, useRouterState } from "@tanstack/react-router";
 import { useAdminSession, signOutAdmin } from "@/lib/admin-auth";
-import { LayoutDashboard, LogOut, Plus, Loader2 } from "lucide-react";
+import { KeyRound, LayoutDashboard, LogOut, Plus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/_layout")({
@@ -29,6 +29,12 @@ function AdminLayout() {
       label: "Tableau de bord",
       icon: LayoutDashboard,
       active: pathname === "/admin" || pathname.startsWith("/admin/produits"),
+    },
+    {
+      to: "/admin/compte",
+      label: "Mon compte",
+      icon: KeyRound,
+      active: pathname.startsWith("/admin/compte"),
     },
   ] as const;
 

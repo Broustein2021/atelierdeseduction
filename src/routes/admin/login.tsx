@@ -1,8 +1,8 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { useAdminSession, signInWithEmail } from "@/lib/admin-auth";
+import { useAdminSession, signInWithEmail, signOutAdmin } from "@/lib/admin-auth";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Loader2, LogIn } from "lucide-react";
+import { Eye, EyeOff, Loader2, LogIn, LogOut } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 
 export const Route = createFileRoute("/admin/login")({
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/admin/login")({
 });
 
 function AdminLogin() {
-  const { loading, session } = useAdminSession();
+  const { loading, session, user, isOwner } = useAdminSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -27,6 +27,41 @@ function AdminLogin() {
 
   if (session) {
     return <Navigate to="/admin" replace />;
+  }
+
+  // Signed in, but with an account that does not own the catalogue: say it
+  // plainly instead of showing the form again as if nothing happened.
+  if (user && !isOwner) {
+    return (
+      <main className="flex min-h-svh items-center justify-center px-4">
+        <div className="w-full max-w-sm text-center">
+          <div className="flex flex-col items-center">
+            <Logo className="text-burgundy" />
+            <h1 className="mt-6 font-display text-3xl">Espace propriétaire</h1>
+          </div>
+          <p className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Vous êtes connecté en tant que{" "}
+            <span className="font-medium">{user.email}</span>, mais ce compte
+            n'a pas accès au catalogue. Utilisez l'adresse e-mail du
+            propriétaire.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-4 w-full"
+            onClick={() => void signOutAdmin().then(() => window.location.reload())}
+          >
+            <LogOut className="size-4" />
+            Se déconnecter
+          </Button>
+          <p className="mt-6 text-center text-xs text-muted">
+            <Link to="/" className="hover:text-ink">
+              ← Retour au site
+            </Link>
+          </p>
+        </div>
+      </main>
+    );
   }
 
   const onSubmit = async (e: React.FormEvent) => {

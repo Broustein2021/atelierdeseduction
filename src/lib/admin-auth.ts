@@ -17,24 +17,38 @@ import { ADMIN_EMAIL } from "@/lib/admin-config";
  * the UI shows.
  */
 
+export type AdminUser = { id: string; email: string | null };
+
 export type AdminSession = {
-  user: { id: string; email: string | null } | null;
+  user: AdminUser | null;
 };
 
-/** Session state for the back office. */
+/**
+ * Session state for the back office.
+ *
+ * `user` is whoever is signed in (owner or not) so the login screen can tell
+ * "wrong password" apart from "signed in, but this account does not own the
+ * catalogue" instead of silently showing the form again. `session` is only
+ * set for the owner account.
+ */
 export function useAdminSession(): {
   loading: boolean;
   session: AdminSession | null;
-  user: AdminSession["user"];
+  user: AdminUser | null;
+  isOwner: boolean;
 } {
   const { user, isPending } = useCurrentUserState();
   const email = (user?.primaryEmail ?? "").toLowerCase();
   const isOwner = Boolean(user) && email === ADMIN_EMAIL.toLowerCase();
+  const signedIn: AdminUser | null = user
+    ? { id: user.id, email: user.primaryEmail }
+    : null;
 
   return {
     loading: isPending,
-    session: isOwner ? { user: { id: user!.id, email: user!.primaryEmail } } : null,
-    user: isOwner ? { id: user!.id, email: user!.primaryEmail } : null,
+    session: isOwner ? { user: signedIn } : null,
+    user: signedIn,
+    isOwner,
   };
 }
 

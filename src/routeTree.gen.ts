@@ -18,6 +18,7 @@ import { Route as AdminLayoutRouteImport } from './routes/admin/_layout'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as ProduitSlugRouteImport } from './routes/produit.$slug'
 import { Route as AdminLayoutIndexRouteImport } from './routes/admin/_layout/index'
+import { Route as AdminLayoutCompteRouteImport } from './routes/admin/_layout/compte'
 import { Route as ApiAdminUploadRouteImport } from './routes/api/admin/upload'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AdminLayoutProduitsSlugRouteImport } from './routes/admin/_layout/produits/$slug'
@@ -68,6 +69,11 @@ const AdminLayoutIndexRoute = AdminLayoutIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminLayoutRoute,
 } as any)
+const AdminLayoutCompteRoute = AdminLayoutCompteRouteImport.update({
+  id: '/compte',
+  path: '/compte',
+  getParentRoute: () => AdminLayoutRoute,
+} as any)
 const ApiAdminUploadRoute = ApiAdminUploadRouteImport.update({
   id: '/api/admin/upload',
   path: '/api/admin/upload',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminLayoutRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
+  '/admin/compte': typeof AdminLayoutCompteRoute
   '/api/admin/upload': typeof ApiAdminUploadRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/': typeof AdminLayoutIndexRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/guide-tailles': typeof GuideTaillesRoute
   '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
+  '/admin/compte': typeof AdminLayoutCompteRoute
   '/api/admin/upload': typeof ApiAdminUploadRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin': typeof AdminLayoutIndexRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/admin/_layout': typeof AdminLayoutRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
+  '/admin/_layout/compte': typeof AdminLayoutCompteRoute
   '/api/admin/upload': typeof ApiAdminUploadRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/_layout/': typeof AdminLayoutIndexRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin/login'
     | '/produit/$slug'
+    | '/admin/compte'
     | '/api/admin/upload'
     | '/api/auth/$'
     | '/admin/'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/guide-tailles'
     | '/admin/login'
     | '/produit/$slug'
+    | '/admin/compte'
     | '/api/admin/upload'
     | '/api/auth/$'
     | '/admin'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/admin/_layout'
     | '/admin/login'
     | '/produit/$slug'
+    | '/admin/_layout/compte'
     | '/api/admin/upload'
     | '/api/auth/$'
     | '/admin/_layout/'
@@ -259,6 +271,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLayoutIndexRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
+    '/admin/_layout/compte': {
+      id: '/admin/_layout/compte'
+      path: '/compte'
+      fullPath: '/admin/compte'
+      preLoaderRoute: typeof AdminLayoutCompteRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
     '/api/admin/upload': {
       id: '/api/admin/upload'
       path: '/api/admin/upload'
@@ -291,12 +310,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminLayoutRouteChildren {
+  AdminLayoutCompteRoute: typeof AdminLayoutCompteRoute
   AdminLayoutIndexRoute: typeof AdminLayoutIndexRoute
   AdminLayoutProduitsSlugRoute: typeof AdminLayoutProduitsSlugRoute
   AdminLayoutProduitsNewRoute: typeof AdminLayoutProduitsNewRoute
 }
 
 const AdminLayoutRouteChildren: AdminLayoutRouteChildren = {
+  AdminLayoutCompteRoute: AdminLayoutCompteRoute,
   AdminLayoutIndexRoute: AdminLayoutIndexRoute,
   AdminLayoutProduitsSlugRoute: AdminLayoutProduitsSlugRoute,
   AdminLayoutProduitsNewRoute: AdminLayoutProduitsNewRoute,
