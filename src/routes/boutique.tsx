@@ -8,7 +8,7 @@ import {
   type ColorId,
 } from "@/data/products";
 import { cn } from "@/lib/utils";
-import { getProducts, type ProductWithMedia } from "@/lib/products-server";
+import { getProducts } from "@/lib/products-server";
 
 type Search = {
   cat?: CategoryId;
@@ -96,7 +96,7 @@ function BoutiquePage() {
       if (size !== "all" && !p.sizes.includes(size)) return false;
       return true;
     });
-  }, [search, size]);
+  }, [products, search, size]);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">

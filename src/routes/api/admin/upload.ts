@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getSupabaseAdmin } from "@/lib/supabase-server";
 
-const ADMIN_EMAIL = "atelierdeseduction@gmail.com";
-const BUCKETS: Record<string, true> = {
-  "product-images": true,
-  "product-videos": true,
-};
-const SAFE_ID = /^[a-zA-Z0-9_-]+$/;
+/**
+ * Media upload API (admin only).
+ *
+ * POST    -> mints a short-lived Vercel Blob client token bound to one
+ *            destination path (the session must belong to the shop owner).
+ * DELETE  -> removes a blob from the store.
+ *
+ * The file itself never goes through this route: the browser PUTs it straight
+ * to Blob with the token, so the serverless body limit does not apply.
+ */
 
 function json(data: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -15,88 +18,87 @@ function json(data: Record<string, unknown>, status = 200) {
   });
 }
 
-async function requireAdmin(request: Request): Promise<Response | null> {
-  const auth = request.headers.get("Authorization");
-  const jwt = auth?.startsWith("Bearer ") ? auth.slice(7) : "";
-  if (!jwt) return json({ error: "Non authentifié." }, 401);
-  const { data, error } = await getSupabaseAdmin().auth.getUser(jwt);
-  if (error || !data.user) return json({ error: "Session invalide." }, 401);
-  if (data.user.email !== ADMIN_EMAIL) return json({ error: "Accès refusé." }, 403);
+function isUploadKind(value: string): value is "images" | "videos" {
+  return value === "images" || value === "videos";
+}
+
+/** The session must belong to the shop owner. */
+async function requireAdmin(): Promise<Response | null> {
+  const { assertSameSiteRequest } = await import("@/lib/auth/isolation.server");
+  const { getSessionUser } = await import("@/lib/auth/verify.server");
+  const { adminEmail } = await import("@/lib/admin-config");
+
+  // Reject scripted cross-site/sibling requests before touching admin data.
+  try {
+    assertSameSiteRequest();
+  } catch {
+    return json({ error: "Accès refusé." }, 403);
+  }
+
+  const user = await getSessionUser();
+  if (!user) return json({ error: "Non authentifié." }, 401);
+  if ((user.email ?? "").toLowerCase() !== adminEmail()) {
+    return json({ error: "Accès refusé." }, 403);
+  }
   return null;
 }
 
 export const Route = createFileRoute("/api/admin/upload")({
   server: {
     handlers: {
-      GET: async () => json({ ok: true }),
+      GET: async () => {
+        const { blobConfigured } = await import("@/lib/blob.server");
+        return json({ ok: true, blob: blobConfigured() });
+      },
 
       POST: async ({ request }) => {
-        const denied = await requireAdmin(request);
+        const denied = await requireAdmin();
         if (denied) return denied;
 
-        let body: {
-          bucket?: unknown;
-          productId?: unknown;
-          fileName?: unknown;
-          contentType?: unknown;
-        };
+        let body: { kind?: unknown; fileName?: unknown };
         try {
           body = await request.json();
         } catch {
           return json({ error: "Corps de requête invalide." }, 400);
         }
 
-        const bucket = body.bucket as string;
-        const productId = body.productId as string;
-        const fileName = body.fileName as string;
+        const kind = String(body.kind ?? "");
+        if (!isUploadKind(kind)) {
+          return json({ error: "Type de média inconnu." }, 400);
+        }
 
-        if (!BUCKETS[bucket]) return json({ error: "Bucket inconnu." }, 400);
-        if (!SAFE_ID.test(productId ?? "")) return json({ error: "productId invalide." }, 400);
-
-        const ext =
-          String(fileName ?? "")
-            .split(".")
-            .pop()
-            ?.toLowerCase()
-            .replace(/[^a-z0-9]/g, "") || "bin";
-        if (!/^[a-z0-9]{1,8}$/.test(ext)) return json({ error: "Extension invalide." }, 400);
-
-        const path = `${productId}/${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2, 10)}.${ext}`;
-
-        const result = await getSupabaseAdmin()
-          .storage.from(bucket)
-          .createSignedUploadUrl(path, { upsert: true });
-
-        if (result.error || !result.data?.signedUrl) {
+        const { blobConfigured, createUploadToken, uploadPathname } =
+          await import("@/lib/blob.server");
+        if (!blobConfigured()) {
           return json(
-            { error: result.error?.message ?? "Impossible de créer l'URL d'upload." },
-            500,
+            { error: "Stockage Vercel Blob non configuré sur ce projet." },
+            503,
           );
         }
 
-        return json({ signedUrl: result.data.signedUrl, path: `${bucket}/${path}` });
+        const pathname = uploadPathname(kind, String(body.fileName ?? ""));
+        const token = await createUploadToken(kind, pathname);
+        return json({ token, pathname });
       },
 
       DELETE: async ({ request }) => {
-        const denied = await requireAdmin(request);
+        const denied = await requireAdmin();
         if (denied) return denied;
 
-        let body: { bucket?: unknown; path?: unknown };
+        let body: { url?: unknown };
         try {
           body = await request.json();
         } catch {
           return json({ error: "Corps de requête invalide." }, 400);
         }
 
-        const bucket = body.bucket as string;
-        const path = body.path as string;
-        if (!BUCKETS[bucket]) return json({ error: "Bucket inconnu." }, 400);
-        if (!path || path.includes("..")) return json({ error: "Chemin invalide." }, 400);
+        const url = String(body.url ?? "");
+        if (!url.startsWith("https://")) {
+          return json({ error: "URL invalide." }, 400);
+        }
 
-        const { error } = await getSupabaseAdmin().storage.from(bucket).remove([path]);
-        if (error) return json({ error: error.message }, 500);
+        const { deleteBlob } = await import("@/lib/blob.server");
+        await deleteBlob(url);
         return json({ ok: true });
       },
     },

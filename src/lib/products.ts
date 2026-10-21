@@ -1,111 +1,43 @@
-﻿import type { Database } from "@/lib/supabase-types";
-import { getSupabaseBrowser } from "@/lib/supabase-browser";
-import type {
-  CategoryId,
-  ColorId,
-  Product,
-} from "@/data/products";
+﻿import {
+  deleteProduct as deleteProductServer,
+  getAdminProductBySlug,
+  getAdminProducts,
+  saveProduct as saveProductServer,
+  type ProductInput,
+  type ProductWithMedia,
+} from "@/lib/products-server";
 
-type ProductRow = Database["public"]["Tables"]["products"]["Row"];
-type ImageRow = Database["public"]["Tables"]["product_images"]["Row"];
-type VideoRow = Database["public"]["Tables"]["product_videos"]["Row"];
+export type { ProductInput, ProductWithMedia };
+export { resolveMediaPath } from "@/lib/media";
 
-export type ProductWithMedia = Product & {
-  images: string[];
-  videos: string[];
-};
+/**
+ * Catalogue access for the back office (browser side).
+ *
+ * The Supabase browser client is gone: the catalogue now lives in the app's
+ * Postgres and is reached through the server functions in
+ * `@/lib/products-server`, which enforce the admin check server-side.
+ */
 
-export const STORAGE_URL = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public`;
-
-/** Resolve a storage_path (either /images/... local, or a bucket path) to a usable URL or path. */
-export function resolveMediaPath(storagePath: string): string {
-  if (storagePath.startsWith("http")) return storagePath;
-  if (storagePath.startsWith("/images/")) return storagePath; // local static asset
-  // otherwise it's a storage bucket path like product-images/file.jpg or videos/...
-  return `${STORAGE_URL}/${storagePath}`;
-}
-
-export async function fetchProducts(): Promise<ProductWithMedia[]> {
-  const supabase = getSupabaseBrowser();
-  const { data, error } = await supabase
-    .from("products")
-    .select("*, product_images(id, storage_path, position, is_cover), product_videos(id, storage_path, type, position)")
-    .eq("is_published", true)
-    .order("created_at", { ascending: false });
-
-  if (error) throw new Error(error.message);
-
-  return (data ?? []).map(toProduct);
-}
-
+/** Every product, published or not. */
 export async function fetchAllProducts(): Promise<ProductWithMedia[]> {
-  const supabase = getSupabaseBrowser();
-  const { data, error } = await supabase
-    .from("products")
-    .select("*, product_images(id, storage_path, position, is_cover), product_videos(id, storage_path, type, position)")
-    .order("created_at", { ascending: false });
-
-  if (error) throw new Error(error.message);
-
-  return (data ?? []).map(toProduct);
+  return getAdminProducts();
 }
 
-export async function fetchProductBySlug(slug: string): Promise<ProductWithMedia | null> {
-  const supabase = getSupabaseBrowser();
-  const { data, error } = await supabase
-    .from("products")
-    .select("*, product_images(id, storage_path, position, is_cover), product_videos(id, storage_path, type, position)")
-    .eq("slug", slug)
-    .eq("is_published", true)
-    .maybeSingle();
-
-  if (error) throw new Error(error.message);
-  return data ? toProduct(data) : null;
+/** One product by slug, published or not. */
+export async function fetchProductBySlugAdmin(
+  slug: string,
+): Promise<ProductWithMedia | null> {
+  return getAdminProductBySlug({ data: slug });
 }
 
-export async function fetchProductBySlugAdmin(slug: string): Promise<ProductWithMedia | null> {
-  const supabase = getSupabaseBrowser();
-  const { data, error } = await supabase
-    .from("products")
-    .select("*, product_images(id, storage_path, position, is_cover), product_videos(id, storage_path, type, position)")
-    .eq("slug", slug)
-    .maybeSingle();
-
-  if (error) throw new Error(error.message);
-  return data ? toProduct(data) : null;
+/** Create or update a product and its media. */
+export async function saveProductAction(
+  input: ProductInput,
+): Promise<{ id: string; slug: string }> {
+  return saveProductServer({ data: input });
 }
 
-function toProduct(row: ProductRow & {
-  product_images?: ImageRow[];
-  product_videos?: VideoRow[];
-}): ProductWithMedia {
-  // Return RAW storage paths so admin forms can round-trip them unmodified.
-  // Display code calls resolveMediaPath() explicitly.
-  const images = [...(row.product_images ?? [])]
-    .sort((a, b) => a.position - b.position)
-    .map((img) => img.storage_path);
-
-  const videos = (row.product_videos ?? [])
-    .sort((a, b) => a.position - b.position)
-    .map((v) => v.storage_path);
-
-  return {
-    id: row.id,
-    slug: row.slug,
-    ref: row.ref ?? "",
-    name: row.name,
-    category: (row.category ?? "ensembles") as CategoryId,
-    colors: (row.colors ?? []) as ColorId[],
-    price: Number(row.price ?? 0),
-    short: row.short ?? row.description ?? "",
-    description: row.description ?? "",
-    material: row.material ?? "",
-    care: row.care ?? "",
-    sizes: (row.sizes ?? []) as string[],
-    images: images.length > 0 ? images : ["/images/products/fallback.jpg"],
-    videos,
-    isNew: row.is_new ?? false,
-    featured: row.featured ?? false,
-  };
+/** Delete a product and its media. */
+export async function deleteProductAction(id: string): Promise<void> {
+  await deleteProductServer({ data: id });
 }
-

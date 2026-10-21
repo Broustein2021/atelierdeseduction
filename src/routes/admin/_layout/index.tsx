@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { fetchAllProducts, resolveMediaPath, type ProductWithMedia } from "@/lib/products";
 import { formatCfa } from "@/lib/utils";
 import { Plus, Package } from "lucide-react";
-import { signOutAdmin } from "@/lib/admin-auth";
 
 export const Route = createFileRoute("/admin/_layout/")({
   component: AdminDashboard,

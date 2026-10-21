@@ -26,7 +26,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; img-src 'self' data: blob: https://*.supabase.co https://*.grok.com https://og.grok.me https://*.vercel.app; media-src 'self' blob: https://*.supabase.co; frame-src https://*.google.com https://maps.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://og.grok.me https://grok.com https://*.vercel.app; script-src 'self' 'unsafe-inline' https://grok.com"
+          "value": "default-src 'self'; base-uri 'self'; img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://*.blob.vercel-storage.com https://*.grok.com https://og.grok.me https://*.vercel.app; media-src 'self' blob: https://*.public.blob.vercel-storage.com https://*.blob.vercel-storage.com; frame-src https://*.google.com https://maps.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.public.blob.vercel-storage.com https://*.blob.vercel-storage.com https://og.grok.me https://grok.com https://*.vercel.app; script-src 'self' 'unsafe-inline' https://grok.com"
         }
       ]
     }

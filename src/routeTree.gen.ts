@@ -19,6 +19,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as ProduitSlugRouteImport } from './routes/produit.$slug'
 import { Route as AdminLayoutIndexRouteImport } from './routes/admin/_layout/index'
 import { Route as ApiAdminUploadRouteImport } from './routes/api/admin/upload'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AdminLayoutProduitsSlugRouteImport } from './routes/admin/_layout/produits/$slug'
 import { Route as AdminLayoutProduitsNewRouteImport } from './routes/admin/_layout/produits/new'
 
@@ -72,6 +73,11 @@ const ApiAdminUploadRoute = ApiAdminUploadRouteImport.update({
   path: '/api/admin/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLayoutProduitsSlugRoute = AdminLayoutProduitsSlugRouteImport.update({
   id: '/produits/$slug',
   path: '/produits/$slug',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
   '/api/admin/upload': typeof ApiAdminUploadRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/': typeof AdminLayoutIndexRoute
   '/admin/produits/$slug': typeof AdminLayoutProduitsSlugRoute
   '/admin/produits/new': typeof AdminLayoutProduitsNewRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
   '/api/admin/upload': typeof ApiAdminUploadRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin': typeof AdminLayoutIndexRoute
   '/admin/produits/$slug': typeof AdminLayoutProduitsSlugRoute
   '/admin/produits/new': typeof AdminLayoutProduitsNewRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
   '/api/admin/upload': typeof ApiAdminUploadRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/_layout/': typeof AdminLayoutIndexRoute
   '/admin/_layout/produits/$slug': typeof AdminLayoutProduitsSlugRoute
   '/admin/_layout/produits/new': typeof AdminLayoutProduitsNewRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/produit/$slug'
     | '/api/admin/upload'
+    | '/api/auth/$'
     | '/admin/'
     | '/admin/produits/$slug'
     | '/admin/produits/new'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/produit/$slug'
     | '/api/admin/upload'
+    | '/api/auth/$'
     | '/admin'
     | '/admin/produits/$slug'
     | '/admin/produits/new'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/produit/$slug'
     | '/api/admin/upload'
+    | '/api/auth/$'
     | '/admin/_layout/'
     | '/admin/_layout/produits/$slug'
     | '/admin/_layout/produits/new'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   ProduitSlugRoute: typeof ProduitSlugRoute
   ApiAdminUploadRoute: typeof ApiAdminUploadRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -253,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/_layout/produits/$slug': {
       id: '/admin/_layout/produits/$slug'
       path: '/produits/$slug'
@@ -296,6 +316,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   ProduitSlugRoute: ProduitSlugRoute,
   ApiAdminUploadRoute: ApiAdminUploadRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

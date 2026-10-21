@@ -1,25 +1,26 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { ImagePlus, Loader2, Trash2, X } from "lucide-react";
-import { resolveMediaPath } from "@/lib/products";
+import { ImagePlus, Loader2, Trash2 } from "lucide-react";
+import { resolveMediaPath } from "@/lib/media";
 import { cn } from "@/lib/utils";
-import { createAdminUploadUrl, deleteAdminMedia, uploadToSignedUrl } from "@/lib/admin-upload";
+import { deleteAdminMedia, uploadMedia } from "@/lib/admin-upload";
 
 const MAX_IMAGES = 10;
-const BUCKET = "product-images";
 const ACCEPT = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 10 * 1024 * 1024; // 10 Mo
 
+/**
+ * Image uploader for the back office.
+ *
+ * Files go straight to Vercel Blob with a token minted by
+ * `/api/admin/upload` (which checks the session server-side). `storagePath`
+ * holds the resulting public URL.
+ */
 export function ImageUploader({
-  supabase,
-  productId,
   images,
   onChange,
 }: {
-  supabase: SupabaseClient;
-  productId: string;
   images: { storagePath: string; isPrimary: boolean }[];
   onChange: (images: { storagePath: string; isPrimary: boolean }[]) => void;
 }) {
@@ -35,7 +36,6 @@ export function ImageUploader({
       const total = fileList.length;
       let done = 0;
 
-      // First, validate all files
       for (const file of fileList) {
         if (!ACCEPT.includes(file.type)) {
           setError(
@@ -54,15 +54,11 @@ export function ImageUploader({
 
       for (const file of fileList) {
         try {
-          const { signedUrl, path: storagePath } = await createAdminUploadUrl(
-            BUCKET,
-            productId,
-            file.name,
-            file.type,
-          );
-          await uploadToSignedUrl(signedUrl, file);
+          const { url } = await uploadMedia("images", file, (percentage) => {
+            setProgress(Math.round(((done + percentage / 100) / total) * 100));
+          });
           uploaded.push({
-            storagePath,
+            storagePath: url,
             isPrimary: images.length === 0,
           });
         } catch (e) {
@@ -79,7 +75,7 @@ export function ImageUploader({
       setUploading(false);
       setProgress(0);
     },
-    [images, onChange, productId],
+    [images, onChange],
   );
 
   const removeImage = useCallback(
@@ -91,11 +87,13 @@ export function ImageUploader({
       }
       onChange(next);
 
-      // Delete from storage (best-effort, non-blocking)
-      const path = storagePath.replace(`${BUCKET}/`, "");
-      void deleteAdminMedia(BUCKET, path).catch(() => {});
+      // Delete from storage (best-effort, non-blocking). Only uploaded files
+      // live in the Blob store — the bundled ones ship with the site.
+      if (storagePath.startsWith("http")) {
+        void deleteAdminMedia(storagePath).catch(() => {});
+      }
     },
-    [images, onChange, supabase],
+    [images, onChange],
   );
 
   const setPrimary = useCallback(

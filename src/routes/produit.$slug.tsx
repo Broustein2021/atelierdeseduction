@@ -7,7 +7,7 @@ import {
   colorLabel,
   colors,
 } from "@/data/products";
-import { getProductBySlug, getProducts, type ProductWithMedia } from "@/lib/products-server";
+import { getProductBySlug, getProducts } from "@/lib/products-server";
 import { formatCfa, cn } from "@/lib/utils";
 
 const SITE_URL = "https://atelierdeseduction.vercel.app";
@@ -132,7 +132,7 @@ function ProductPage() {
               <p className="text-[11px] tracking-[0.16em] uppercase text-muted">
                 En vidéo
               </p>
-              {product.videos.map((src, i) => (
+              {product.videos.map((src) => (
                 <div
                   key={src}
                   className="overflow-hidden rounded-xl bg-ink"

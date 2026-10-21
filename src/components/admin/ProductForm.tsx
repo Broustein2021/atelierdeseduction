@@ -1,11 +1,14 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { getSupabaseBrowser } from "@/lib/supabase-browser";
-import { categories, colors, categoryLabel, colorLabel } from "@/data/products";
+import { useEffect, useState } from "react";
+import { categories, colors } from "@/data/products";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { VideoUploader } from "@/components/admin/VideoUploader";
-import { resolveMediaPath, type ProductWithMedia } from "@/lib/products";
+import {
+  deleteProductAction,
+  saveProductAction,
+  type ProductWithMedia,
+} from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2, Save, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -51,7 +54,6 @@ const inputCls =
 
 export function ProductForm({ product }: { product?: ProductWithMedia }) {
   const navigate = useNavigate();
-  const supabase = getSupabaseBrowser();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [images, setImages] = useState<{ storagePath: string; isPrimary: boolean }[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
@@ -79,8 +81,12 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
         featured: product.featured ?? false,
         isPublished: true,
       });
+      const cover = product.cover ?? null;
       setImages(
-        product.images.map((src) => ({ storagePath: src, isPrimary: false })),
+        product.images.map((src, index) => ({
+          storagePath: src,
+          isPrimary: cover ? src === cover : index === 0,
+        })),
       );
       setVideos(product.videos ?? []);
     }
@@ -119,128 +125,26 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
     setError("");
     setSaving(true);
 
-    const price = Number(form.price);
-    const payload = {
-      name: form.name,
-      slug: form.slug,
-      ref: form.ref || form.slug.toUpperCase(),
-      category: form.category,
-      price,
-      short: form.short,
-      description: form.description,
-      material: form.material,
-      care: form.care,
-      colors: form.colors,
-      sizes: form.sizes,
-      is_new: form.isNew,
-      featured: form.featured,
-      is_published: publish,
-    };
-
     try {
-      const { data: saved, error: err } = isEdit
-        ? await supabase
-            .from("products")
-            .update(payload)
-            .eq("id", product!.id)
-            .select()
-            .single()
-        : await supabase.from("products").insert(payload).select().single();
-
-      if (err) throw new Error(err.message);
-      const savedSlug = saved!.slug;
-
-      // Reconcile images table if needed (for newly uploaded images)
-      if (isEdit) {
-        // Delete existing image rows that are no longer in the list and not local
-        const existingLocal = product!.images;
-        const keepPaths = images.map((i) => i.storagePath);
-        for (const oldSrc of existingLocal) {
-          if (!keepPaths.includes(oldSrc) && !oldSrc.startsWith("/images/")) {
-            await supabase
-              .from("product_images")
-              .delete()
-              .eq("product_id", product!.id)
-              .eq("storage_path", oldSrc);
-          }
-        }
-      }
-
-      // Insert/update image records for storage-backed images
-      const storageImages = images.filter((i) => !i.storagePath.startsWith("/images/"));
-      if (isEdit && storageImages.length > 0) {
-        for (const img of storageImages) {
-          const existing = await supabase
-            .from("product_images")
-            .select("id")
-            .eq("product_id", product!.id)
-            .eq("storage_path", img.storagePath)
-            .maybeSingle();
-          if (!existing.data) {
-            await supabase.from("product_images").insert({
-              product_id: product!.id,
-              storage_path: img.storagePath,
-              is_cover: img.isPrimary,
-            });
-          } else {
-            await supabase
-              .from("product_images")
-              .update({ is_cover: img.isPrimary })
-              .eq("id", existing.data.id);
-          }
-        }
-      }
-
-      // For new products, insert image rows
-      if (!isEdit && storageImages.length > 0) {
-        for (let i = 0; i < storageImages.length; i++) {
-          await supabase.from("product_images").insert({
-            product_id: saved!.id,
-            storage_path: storageImages[i].storagePath,
-            position: i,
-            is_cover: storageImages[i].isPrimary,
-          });
-        }
-      }
-
-      // Videos
-      const videoPaths = videos;
-      if (isEdit) {
-        const existingVids = (product!.videos ?? []);
-        for (const oldV of existingVids) {
-          if (!videoPaths.includes(oldV) && !oldV.startsWith("/images/")) {
-            await supabase
-              .from("product_videos")
-              .delete()
-              .eq("product_id", product!.id)
-              .eq("storage_path", oldV);
-          }
-        }
-        for (let i = 0; i < videoPaths.length; i++) {
-          if (videoPaths[i].startsWith("/images/")) continue;
-          const existing = await supabase
-            .from("product_videos")
-            .select("id")
-            .eq("product_id", product!.id)
-            .eq("storage_path", videoPaths[i])
-            .maybeSingle();
-          if (!existing.data) {
-            await supabase.from("product_videos").insert({
-              product_id: product!.id,
-              storage_path: videoPaths[i],
-              position: i,
-            });
-          }
-        }
-      } else if (videoPaths.length > 0) {
-        for (let i = 0; i < videoPaths.length; i++) {
-          await supabase.from("product_videos").insert({
-            product_id: saved!.id,
-            storage_path: videoPaths[i],
-            position: i,
-          });
-        }
-      }
+      await saveProductAction({
+        id: product?.id ?? null,
+        name: form.name,
+        slug: form.slug,
+        ref: form.ref || form.slug.toUpperCase(),
+        category: form.category,
+        price: Number(form.price),
+        short: form.short,
+        description: form.description,
+        material: form.material,
+        care: form.care,
+        colors: form.colors,
+        sizes: form.sizes,
+        is_new: form.isNew,
+        featured: form.featured,
+        is_published: publish,
+        images,
+        videos,
+      });
 
       setSaving(false);
       navigate({ to: "/admin" });
@@ -260,9 +164,7 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
       return;
     setLoading(true);
     try {
-      await supabase.from("product_images").delete().eq("product_id", product.id);
-      await supabase.from("product_videos").delete().eq("product_id", product.id);
-      await supabase.from("products").delete().eq("id", product.id);
+      await deleteProductAction(product.id);
       navigate({ to: "/admin" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur de suppression.");
@@ -439,24 +341,14 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
           title="Images"
           hint="Photos de l'article — couvrez la pièce sous tous les angles."
         >
-          <ImageUploader
-            supabase={supabase}
-            productId={isEdit ? product!.id : `new-${Date.now()}`}
-            images={images}
-            onChange={setImages}
-          />
+          <ImageUploader images={images} onChange={setImages} />
         </Section>
 
         <Section
           title="Vidéos"
           hint="Montrez l'article en mouvement. Vidéo 50 Mo max, MP4 conseillé."
         >
-          <VideoUploader
-            supabase={supabase}
-            productId={isEdit ? product!.id : `new-${Date.now()}`}
-            videos={videos}
-            onChange={setVideos}
-          />
+          <VideoUploader videos={videos} onChange={setVideos} />
         </Section>
 
         <Section title="Options">

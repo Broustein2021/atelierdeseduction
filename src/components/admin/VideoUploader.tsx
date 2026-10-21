@@ -1,24 +1,25 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { Film, Loader2, Trash2, UploadCloud } from "lucide-react";
-import { resolveMediaPath } from "@/lib/products";
-import { createAdminUploadUrl, deleteAdminMedia, uploadToSignedUrl } from "@/lib/admin-upload";
+import { Loader2, Trash2, UploadCloud } from "lucide-react";
+import { resolveMediaPath } from "@/lib/media";
+import { deleteAdminMedia, uploadMedia } from "@/lib/admin-upload";
 
 const MAX_VIDEOS = 3;
-const BUCKET = "product-videos";
 const ACCEPT = ["video/mp4", "video/webm", "video/quicktime"];
 const MAX_SIZE = 50 * 1024 * 1024; // 50 Mo
 
+/**
+ * Video uploader for the back office.
+ *
+ * Files go straight to Vercel Blob with a token minted by
+ * `/api/admin/upload` (which checks the session server-side), so the 50 Mo
+ * limit is not capped by a serverless request body.
+ */
 export function VideoUploader({
-  supabase,
-  productId,
   videos,
   onChange,
 }: {
-  supabase: SupabaseClient;
-  productId: string;
   videos: string[];
   onChange: (videos: string[]) => void;
 }) {
@@ -44,32 +45,31 @@ export function VideoUploader({
           setError(`La vidéo ${file.name} dépasse 50 Mo.`);
           return;
         }
-        if (videos.length + 1 > MAX_VIDEOS) {
-          setError(`Maximum ${MAX_VIDEOS} vidéos par article.`);
-          return;
-        }
+      }
+      if (videos.length + fileList.length > MAX_VIDEOS) {
+        setError(`Maximum ${MAX_VIDEOS} vidéos par article.`);
+        return;
       }
 
       setUploading(true);
       const uploaded: string[] = [];
+      const total = fileList.length;
+      let done = 0;
 
       for (const file of fileList) {
         setCurrentFile(file.name);
         try {
-          const { signedUrl, path: storagePath } = await createAdminUploadUrl(
-            BUCKET,
-            productId,
-            file.name,
-            file.type,
-          );
-          await uploadToSignedUrl(signedUrl, file);
-          uploaded.push(storagePath);
-          setProgress((prev) => prev + Math.round(100 / fileList.length));
+          const { url } = await uploadMedia("videos", file, (percentage) => {
+            setProgress(Math.round(((done + percentage / 100) / total) * 100));
+          });
+          uploaded.push(url);
         } catch (e) {
           setError(e instanceof Error ? e.message : `Erreur d'upload : ${e}`);
           setUploading(false);
           return;
         }
+        done += 1;
+        setProgress(Math.round((done / total) * 100));
       }
 
       onChange([...videos, ...uploaded].slice(0, MAX_VIDEOS));
@@ -81,10 +81,12 @@ export function VideoUploader({
   );
 
   const removeVideo = useCallback(
-    async (storagePath: string) => {
+    (storagePath: string) => {
       onChange(videos.filter((v) => v !== storagePath));
-      const path = storagePath.replace(`${BUCKET}/`, "");
-      void deleteAdminMedia(BUCKET, path).catch(() => {});
+      // Only uploaded files live in the Blob store.
+      if (storagePath.startsWith("http")) {
+        void deleteAdminMedia(storagePath).catch(() => {});
+      }
     },
     [videos, onChange],
   );
@@ -106,7 +108,7 @@ export function VideoUploader({
               />
               <button
                 type="button"
-                onClick={() => void removeVideo(v)}
+                onClick={() => removeVideo(v)}
                 className="absolute right-2 top-2 rounded bg-red-600/90 p-1.5 text-paper opacity-0 transition-opacity group-hover:opacity-100"
                 aria-label="Supprimer la vidéo"
               >

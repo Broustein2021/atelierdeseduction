@@ -1,42 +1,58 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getSupabaseBrowser } from "@/lib/supabase-browser";
-import type { Session, User } from "@supabase/supabase-js";
+import { useCurrentUserState } from "@/lib/auth/use-current-user";
+import { authClient } from "@/lib/auth/client";
+import { ADMIN_EMAIL } from "@/lib/admin-config";
 
-export function useAdminSession() {
-  const [loading, setLoading] = useState(true);
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+/**
+ * Back-office session (browser side).
+ *
+ * The app runs its own Better Auth at same-origin `/api/auth/*`, so the
+ * session is a plain HttpOnly cookie — no token to store, nothing to attach
+ * by hand. The Supabase client this used to rely on is gone.
+ *
+ * A session alone is not enough: the catalogue has a single owner, so the
+ * signed-in account must be {@link ADMIN_EMAIL}. The same check runs
+ * server-side (`@/lib/auth/admin-middleware`) — this one only decides what
+ * the UI shows.
+ */
 
-  useEffect(() => {
-    const supabase = getSupabaseBrowser();
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-    });
+export type AdminSession = {
+  user: { id: string; email: string | null } | null;
+};
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      setLoading(false);
-    });
+/** Session state for the back office. */
+export function useAdminSession(): {
+  loading: boolean;
+  session: AdminSession | null;
+  user: AdminSession["user"];
+} {
+  const { user, isPending } = useCurrentUserState();
+  const email = (user?.primaryEmail ?? "").toLowerCase();
+  const isOwner = Boolean(user) && email === ADMIN_EMAIL.toLowerCase();
 
-    return () => sub.subscription.unsubscribe();
-  }, []);
-
-  return { loading, session, user };
+  return {
+    loading: isPending,
+    session: isOwner ? { user: { id: user!.id, email: user!.primaryEmail } } : null,
+    user: isOwner ? { id: user!.id, email: user!.primaryEmail } : null,
+  };
 }
 
-export async function signInWithEmail(email: string, password: string) {
-  return getSupabaseBrowser().auth.signInWithPassword({ email, password });
+/** Sign in with email + password. Returns `{ error }` instead of throwing. */
+export async function signInWithEmail(
+  email: string,
+  password: string,
+): Promise<{ error: { message: string } | null }> {
+  const { error } = await authClient.signIn.email({ email, password });
+  return {
+    error: error
+      ? { message: error.message ?? "Identifiants invalides." }
+      : null,
+  };
 }
 
-export async function signUpWithEmail(email: string, password: string) {
-  return getSupabaseBrowser().auth.signUp({ email, password });
-}
-
-export async function signOutAdmin() {
-  return getSupabaseBrowser().auth.signOut();
+/** Sign out of the back office. */
+export async function signOutAdmin(): Promise<void> {
+  const { error } = await authClient.signOut();
+  if (error) throw new Error(error.message ?? "Déconnexion impossible.");
 }
