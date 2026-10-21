@@ -72,7 +72,8 @@ function AdminLogin() {
     setSubmitting(false);
     if (err) {
       setError(
-        err.message === "Invalid login credentials"
+        err.message === "Invalid login credentials" ||
+        err.message === "Invalid email or password"
           ? "Email ou mot de passe incorrect."
           : err.message,
       );
