@@ -1,7 +1,8 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { categories, colors } from "@/data/products";
+import { deleteAdminMedia } from "@/lib/admin-upload";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { VideoUploader } from "@/components/admin/VideoUploader";
 import { StorageNotice } from "@/components/admin/StorageNotice";
@@ -61,6 +62,11 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  /** Media as stored in the database, for the post-save cleanup diff. */
+  const savedMedia = useRef<{ images: string[]; videos: string[] }>({
+    images: [],
+    videos: [],
+  });
 
   const isEdit = Boolean(product);
 
@@ -90,6 +96,10 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
         })),
       );
       setVideos(product.videos ?? []);
+      savedMedia.current = {
+        images: product.images,
+        videos: product.videos ?? [],
+      };
     }
   }, [product]);
 
@@ -146,6 +156,17 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
         images,
         videos,
       });
+
+      // Media dropped from the saved product can leave the Blob store now:
+      // nothing references them anymore (the form may be abandoned, which is
+      // why this cannot run when the user merely removes a thumbnail).
+      const keptImages = new Set(images.map((image) => image.storagePath));
+      const keptVideos = new Set(videos);
+      const stale = [
+        ...savedMedia.current.images.filter((url) => !keptImages.has(url)),
+        ...savedMedia.current.videos.filter((url) => !keptVideos.has(url)),
+      ].filter((url) => url.startsWith("http"));
+      await Promise.allSettled(stale.map((url) => deleteAdminMedia(url)));
 
       setSaving(false);
       navigate({ to: "/admin" });

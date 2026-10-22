@@ -130,6 +130,31 @@ export const getProducts = createServerFn({ method: "GET" }).handler(async () =>
   return rows.map(toProduct);
 });
 
+/**
+ * Published product slugs + last update, for `/sitemap.xml`.
+ *
+ * A plain function (not a server function) so the sitemap route can call it
+ * directly, without a round trip through the server-function protocol.
+ */
+export async function listSitemapEntries(): Promise<
+  { slug: string; lastmod: string }[]
+> {
+  const sql = await db();
+  const rows = await sql.query<{ slug: string; updated_at: string | Date }>(
+    "select slug, updated_at from catalogue_products where is_published = true",
+  );
+  return rows.map((row) => {
+    const date =
+      row.updated_at instanceof Date ? row.updated_at : new Date(row.updated_at);
+    return {
+      slug: row.slug,
+      lastmod: Number.isNaN(date.getTime())
+        ? ""
+        : date.toISOString().slice(0, 10),
+    };
+  });
+}
+
 /** One published product by slug, or `null`. */
 export const getProductBySlug = createServerFn({ method: "GET" })
   .validator((slug: string) => slug)
@@ -280,12 +305,31 @@ export const saveProduct = createServerFn({ method: "POST" })
     return { id: row.id, slug: row.slug };
   });
 
-/** Delete a product and its media (cascaded). Admin only. */
+/**
+ * Delete a product, its media rows (cascaded) and its uploaded files.
+ * Admin only.
+ */
 export const deleteProduct = createServerFn({ method: "POST" })
   .middleware([adminMiddleware])
   .validator((id: string) => id)
   .handler(async ({ data: id }) => {
     const sql = await db();
+    // Read the media before the cascade drops the rows: uploaded files live in
+    // Blob and would otherwise be orphaned (billed, never reachable).
+    const media = await sql.query<{ storage_path: string }>(
+      `select storage_path from catalogue_product_images where product_id = $1
+       union all
+       select storage_path from catalogue_product_videos where product_id = $1`,
+      [id],
+    );
     await sql.query("delete from catalogue_products where id = $1", [id]);
+
+    const urls = media
+      .map((row) => row.storage_path)
+      .filter((path) => path.startsWith("https://"));
+    if (urls.length > 0) {
+      const { deleteBlob } = await import("@/lib/blob.server");
+      await Promise.allSettled(urls.map((url) => deleteBlob(url)));
+    }
     return { ok: true };
   });

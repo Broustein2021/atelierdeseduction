@@ -26,6 +26,17 @@ export const site = {
     "https://www.google.com/maps/search/?api=1&query=Riviera+Bonoumin+Residence+Ryan+Abidjan",
 } as const;
 
+/**
+ * Canonical origin of the shop, without a trailing slash.
+ *
+ * Used for absolute URLs (Open Graph, JSON-LD, sitemap). Set `VITE_SITE_URL`
+ * when the shop moves to its own domain so nothing here has to change.
+ */
+export const SITE_URL = (
+  (import.meta.env.VITE_SITE_URL as string | undefined)?.trim() ||
+  "https://atelierdeseduction.vercel.app"
+).replace(/\/+$/, "");
+
 export function waUrl(text: string): string {
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(text)}`;
 }

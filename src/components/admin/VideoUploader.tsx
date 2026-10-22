@@ -24,6 +24,8 @@ export function VideoUploader({
   onChange: (videos: string[]) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  /** URLs uploaded during this session: they were never saved anywhere. */
+  const sessionUploads = useRef<Set<string>>(new Set());
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [progress, setProgress] = useState(0);
@@ -62,6 +64,7 @@ export function VideoUploader({
           const { url } = await uploadMedia("videos", file, (percentage) => {
             setProgress(Math.round(((done + percentage / 100) / total) * 100));
           });
+          sessionUploads.current.add(url);
           uploaded.push(url);
         } catch (e) {
           setError(e instanceof Error ? e.message : `Erreur d'upload : ${e}`);
@@ -83,8 +86,10 @@ export function VideoUploader({
   const removeVideo = useCallback(
     (storagePath: string) => {
       onChange(videos.filter((v) => v !== storagePath));
-      // Only uploaded files live in the Blob store.
-      if (storagePath.startsWith("http")) {
+      // Only files uploaded in this session are safe to delete right away;
+      // saved ones are removed after a successful save (the form may still be
+      // abandoned, and the product still points at them until then).
+      if (sessionUploads.current.delete(storagePath)) {
         void deleteAdminMedia(storagePath).catch(() => {});
       }
     },

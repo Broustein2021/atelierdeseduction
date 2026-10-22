@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Share2 } from "lucide-react";
 import { WhatsAppCta } from "@/components/product/WhatsAppCta";
 import { ProductCard } from "@/components/product/ProductCard";
 import {
@@ -7,11 +8,9 @@ import {
   colorLabel,
   colors,
 } from "@/data/products";
+import { SITE_URL, site } from "@/data/site";
 import { getProductBySlug, getProducts } from "@/lib/products-server";
 import { formatCfa, cn } from "@/lib/utils";
-
-const SITE_URL = "https://atelierdeseduction.vercel.app";
-const SITE_NAME = "L'Atelier de la Séduction";
 
 function toAbsoluteImage(src: string): string {
   if (src.startsWith("http")) return src;
@@ -50,6 +49,7 @@ export const Route = createFileRoute("/produit/$slug")({
         { title },
         { name: "description", content: description },
       ],
+      links: [{ rel: "canonical", href: productUrl }],
       scripts: [
         {
           type: "application/ld+json",
@@ -60,7 +60,7 @@ export const Route = createFileRoute("/produit/$slug")({
             description,
             image: [image ? toAbsoluteImage(image) : SITE_URL + "/og.jpg"],
             sku: product.ref,
-            brand: { "@type": "Brand", name: SITE_NAME },
+            brand: { "@type": "Brand", name: site.name },
             offers: {
               "@type": "Offer",
               price: product.price,
@@ -79,8 +79,22 @@ export const Route = createFileRoute("/produit/$slug")({
 function ProductPage() {
   const { product, related } = Route.useLoaderData();
   const [active, setActive] = useState(0);
-  const [size, setSize] = useState(product.sizes[1] ?? product.sizes[0]);
-  const [color, setColor] = useState(product.colors[0]);
+  const [size, setSize] = useState(product.sizes[0] ?? "");
+  const [color, setColor] = useState(product.colors[0] ?? "");
+
+  // The route component is reused when navigating between products (related
+  // pieces): reset the selection so a size/colour from the previous piece is
+  // never sent to WhatsApp for the new one.
+  useEffect(() => {
+    setActive(0);
+    setSize(product.sizes[0] ?? "");
+    setColor(product.colors[0] ?? "");
+  }, [product]);
+
+  const productUrl = `${SITE_URL}/produit/${product.slug}`;
+  const shareHref = `https://wa.me/?text=${encodeURIComponent(
+    `${product.name} — ${formatCfa(product.price)}\n${productUrl}`,
+  )}`;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
@@ -231,13 +245,22 @@ function ProductPage() {
             <WhatsAppCta
               product={product}
               size={size}
-              color={colorLabel[color]}
+              color={color ? colorLabel[color] : undefined}
               label="Commander sur WhatsApp"
             />
             <p className="text-center text-xs text-muted">
               Le message est prérempli avec la référence, la couleur et la
               taille. Stock et paiement confirmés dans la conversation.
             </p>
+            <a
+              href={shareHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mx-auto inline-flex items-center gap-1.5 text-xs text-burgundy underline-offset-4 hover:underline"
+            >
+              <Share2 className="size-3.5" />
+              Partager cette pièce sur WhatsApp
+            </a>
           </div>
 
           <dl className="mt-10 space-y-4 border-t border-line pt-8 text-sm">

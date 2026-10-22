@@ -5,9 +5,13 @@ import { ImagePlus, Loader2, Trash2 } from "lucide-react";
 import { resolveMediaPath } from "@/lib/media";
 import { cn } from "@/lib/utils";
 import { deleteAdminMedia, uploadMedia } from "@/lib/admin-upload";
+import { compressImage } from "@/lib/image-compress";
 
 const MAX_IMAGES = 10;
+/** Types the browser can upload (after conversion). */
 const ACCEPT = ["image/jpeg", "image/png", "image/webp"];
+/** Accepted by the file picker so phone photos (HEIC) can be converted. */
+const INPUT_ACCEPT = "image/jpeg,image/png,image/webp,image/heic,image/heif";
 const MAX_SIZE = 10 * 1024 * 1024; // 10 Mo
 
 /**
@@ -25,6 +29,8 @@ export function ImageUploader({
   onChange: (images: { storagePath: string; isPrimary: boolean }[]) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  /** URLs uploaded during this session: they were never saved anywhere. */
+  const sessionUploads = useRef<Set<string>>(new Set());
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [progress, setProgress] = useState(0);
@@ -37,7 +43,7 @@ export function ImageUploader({
       let done = 0;
 
       for (const file of fileList) {
-        if (!ACCEPT.includes(file.type)) {
+        if (!file.type.startsWith("image/")) {
           setError(
             `Format non supporté : ${file.name || file.type}. Utilisez JPG, PNG ou WebP.`,
           );
@@ -54,12 +60,21 @@ export function ImageUploader({
 
       for (const file of fileList) {
         try {
-          const { url } = await uploadMedia("images", file, (percentage) => {
+          const ready = await compressImage(file);
+          if (!ACCEPT.includes(ready.type)) {
+            setError(
+              `Format non supporté : ${file.name || file.type}. Utilisez JPG, PNG ou WebP.`,
+            );
+            setUploading(false);
+            return;
+          }
+          const { url } = await uploadMedia("images", ready, (percentage) => {
             setProgress(Math.round(((done + percentage / 100) / total) * 100));
           });
+          sessionUploads.current.add(url);
           uploaded.push({
             storagePath: url,
-            isPrimary: images.length === 0,
+            isPrimary: images.length === 0 && uploaded.length === 0,
           });
         } catch (e) {
           setError(e instanceof Error ? e.message : `Erreur d'upload : ${e}`);
@@ -87,9 +102,12 @@ export function ImageUploader({
       }
       onChange(next);
 
-      // Delete from storage (best-effort, non-blocking). Only uploaded files
-      // live in the Blob store — the bundled ones ship with the site.
-      if (storagePath.startsWith("http")) {
+      // Only files uploaded in this session are safe to delete right away:
+      // they were never saved, so nothing else references them. Images already
+      // in the catalogue are removed from the store after a successful save
+      // (the form may still be abandoned, and the product still points at
+      // them until then).
+      if (sessionUploads.current.delete(storagePath)) {
         void deleteAdminMedia(storagePath).catch(() => {});
       }
     },
@@ -178,7 +196,7 @@ export function ImageUploader({
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept={INPUT_ACCEPT}
         multiple
         className="hidden"
         onChange={(e) => {
@@ -191,7 +209,8 @@ export function ImageUploader({
         <p className="mt-2 text-sm text-red-600">{error}</p>
       ) : null}
       <p className="mt-2 text-xs text-muted">
-        JPG, PNG ou WebP — 10 Mo max par image. Cliquez pour sélectionner plusieurs fichiers.
+        JPG, PNG ou WebP — 10 Mo max par image. Les photos sont redimensionnées
+        (1600 px, WebP) automatiquement pour garder le site rapide.
       </p>
     </div>
   );
