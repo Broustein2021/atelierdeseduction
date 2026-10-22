@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Share2 } from "lucide-react";
+import { Monogram } from "@/components/brand/Logo";
 import { WhatsAppCta } from "@/components/product/WhatsAppCta";
 import { ProductCard } from "@/components/product/ProductCard";
 import {
@@ -113,11 +114,17 @@ function ProductPage() {
       <div className="mt-6 grid gap-8 lg:grid-cols-2 lg:gap-14">
         <div>
           <div className="overflow-hidden rounded-xl bg-sand">
-            <img
-              src={product.images[active] ?? product.images[0]}
-              alt={product.name}
-              className="aspect-portrait w-full object-cover"
-            />
+            {product.images[active] ?? product.images[0] ? (
+              <img
+                src={product.images[active] ?? product.images[0]}
+                alt={product.name}
+                className="aspect-portrait w-full object-cover"
+              />
+            ) : (
+              <div className="flex aspect-portrait w-full items-center justify-center">
+                <Monogram className="h-16 text-burgundy/25" />
+              </div>
+            )}
           </div>
           {product.images.length > 1 ? (
             <div className="mt-3 grid grid-cols-4 gap-2">

@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Monogram } from "@/components/brand/Logo";
 import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import {
   categoryLabel,
@@ -23,12 +24,18 @@ export function ProductCard({
         className="relative block overflow-hidden rounded-lg bg-sand"
       >
         <div className="aspect-portrait overflow-hidden">
-          <img
-            src={product.images[0]}
-            alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-            loading={eager ? "eager" : "lazy"}
-          />
+          {product.images[0] ? (
+            <img
+              src={product.images[0]}
+              alt={product.name}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+              loading={eager ? "eager" : "lazy"}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-sand">
+              <Monogram className="h-10 text-burgundy/25" />
+            </div>
+          )}
         </div>
         {product.isNew ? (
           <span className="absolute left-3 top-3 rounded-full bg-paper/95 px-2.5 py-1 text-[10px] tracking-[0.16em] uppercase text-burgundy">
