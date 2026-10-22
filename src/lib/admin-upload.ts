@@ -40,16 +40,36 @@ export async function uploadMedia(
     throw new Error(data.error ?? "Impossible de préparer l'upload.");
   }
 
-  const blob = await put(data.pathname, file, {
-    access: "public",
-    token: data.token,
-    contentType: file.type,
-    onUploadProgress: onUploadProgress
-      ? ({ percentage }) => onUploadProgress(Math.round(percentage))
-      : undefined,
-  });
+  try {
+    const blob = await put(data.pathname, file, {
+      access: "public",
+      token: data.token,
+      contentType: file.type,
+      onUploadProgress: onUploadProgress
+        ? ({ percentage }) => onUploadProgress(Math.round(percentage))
+        : undefined,
+    });
 
-  return { url: blob.url, pathname: blob.pathname };
+    return { url: blob.url, pathname: blob.pathname };
+  } catch (e) {
+    throw new Error(explainUploadError(e));
+  }
+}
+
+/** Turn raw Blob SDK errors into something the shop owner can act on. */
+function explainUploadError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  if (/private store/i.test(message)) {
+    return (
+      "Le store Vercel Blob est en accès privé : les images du catalogue doivent être publiques. " +
+      "Créez un store public (projet > Storage > Create Storage > Blob > Public), " +
+      "puis reconnectez-le au projet."
+    );
+  }
+  if (/Failed to fetch|NetworkError|load failed/i.test(message)) {
+    return "L'upload a été bloqué par le navigateur (CSP ou réseau). Réessayez.";
+  }
+  return message || "Erreur d'upload.";
 }
 
 /** Remove a media file from the Blob store. */
