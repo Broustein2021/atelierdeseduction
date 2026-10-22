@@ -9,8 +9,8 @@
  * sharp while cutting most pages' weight by 5-10x.
  */
 
-const MAX_EDGE = 1600;
-const QUALITY = 0.82;
+const MAX_EDGE = 1440;
+const QUALITY = 0.8;
 const SKIP_BELOW_BYTES = 300 * 1024;
 
 export async function compressImage(file: File): Promise<File> {

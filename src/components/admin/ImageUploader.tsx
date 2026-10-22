@@ -210,7 +210,7 @@ export function ImageUploader({
       ) : null}
       <p className="mt-2 text-xs text-muted">
         JPG, PNG ou WebP — 10 Mo max par image. Les photos sont redimensionnées
-        (1600 px, WebP) automatiquement pour garder le site rapide.
+        (1440 px, WebP) automatiquement pour garder le site rapide.
       </p>
     </div>
   );
