@@ -14,6 +14,7 @@ import { Route as AProposRouteImport } from './routes/a-propos'
 import { Route as BoutiqueRouteImport } from './routes/boutique'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as GuideTaillesRouteImport } from './routes/guide-tailles'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AdminLayoutRouteImport } from './routes/admin/_layout'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
@@ -48,6 +49,11 @@ const ContactRoute = ContactRouteImport.update({
 const GuideTaillesRoute = GuideTaillesRouteImport.update({
   id: '/guide-tailles',
   path: '/guide-tailles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/boutique': typeof BoutiqueRoute
   '/contact': typeof ContactRoute
   '/guide-tailles': typeof GuideTaillesRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AdminLayoutRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/boutique': typeof BoutiqueRoute
   '/contact': typeof ContactRoute
   '/guide-tailles': typeof GuideTaillesRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/login': typeof AdminLoginRoute
   '/produit/$slug': typeof ProduitSlugRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/boutique': typeof BoutiqueRoute
   '/contact': typeof ContactRoute
   '/guide-tailles': typeof GuideTaillesRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/_layout': typeof AdminLayoutRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/boutique'
     | '/contact'
     | '/guide-tailles'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/admin'
     | '/admin/login'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/boutique'
     | '/contact'
     | '/guide-tailles'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/admin/login'
     | '/produit/$slug'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/boutique'
     | '/contact'
     | '/guide-tailles'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/admin/_layout'
     | '/admin/login'
@@ -211,6 +223,7 @@ export interface RootRouteChildren {
   BoutiqueRoute: typeof BoutiqueRoute
   ContactRoute: typeof ContactRoute
   GuideTaillesRoute: typeof GuideTaillesRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminLayoutRoute: typeof AdminLayoutRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
@@ -254,6 +267,13 @@ declare module '@tanstack/react-router' {
       path: '/guide-tailles'
       fullPath: '/guide-tailles'
       preLoaderRoute: typeof GuideTaillesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -353,6 +373,7 @@ const rootRouteChildren: RootRouteChildren = {
   BoutiqueRoute: BoutiqueRoute,
   ContactRoute: ContactRoute,
   GuideTaillesRoute: GuideTaillesRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminLayoutRoute: AdminLayoutRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
