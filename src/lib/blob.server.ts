@@ -1,4 +1,4 @@
-import { del } from "@vercel/blob";
+import { del, put } from "@vercel/blob";
 import { generateClientTokenFromReadWriteToken } from "@vercel/blob/client";
 
 /**
@@ -34,6 +34,49 @@ const KIND_CONFIG = {
 /** True when the project has a Blob store wired up. */
 export function blobConfigured(): boolean {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN?.trim());
+}
+
+/**
+ * Access mode of the connected store.
+ *
+ * A store's access mode is fixed at creation: `public` serves the blobs
+ * straight from the CDN (what the catalogue needs), `private` requires an
+ * authenticated read for every file — and the browser upload API only writes
+ * public blobs. The mode is probed server-side because the browser cannot
+ * read the Blob API's error body (no CORS headers on that response).
+ */
+export type StoreAccess = "public" | "private" | "unknown";
+
+let cachedAccess: { value: StoreAccess; at: number } | null = null;
+const PROBE_TTL_MS = 60_000;
+
+/** Probe (and cache) whether the store accepts public reads/writes. */
+export async function probeStoreAccess(): Promise<StoreAccess> {
+  if (cachedAccess && Date.now() - cachedAccess.at < PROBE_TTL_MS) {
+    return cachedAccess.value;
+  }
+  const token = process.env.BLOB_READ_WRITE_TOKEN?.trim();
+  let value: StoreAccess = "unknown";
+  if (token) {
+    try {
+      // A 12-byte probe blob, deleted right away: the Blob API rejects a
+      // public write on a private store, which is the only reliable signal
+      // (the browser cannot read that error body: no CORS headers on it).
+      const probe = await put(".access-probe", "ok", {
+        access: "public",
+        token,
+        addRandomSuffix: true,
+        contentType: "text/plain",
+      });
+      await del(probe.url, { token }).catch(() => undefined);
+      value = "public";
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error ?? "");
+      if (/private store/i.test(message)) value = "private";
+    }
+  }
+  cachedAccess = { value, at: Date.now() };
+  return value;
 }
 
 /** Build a safe, unique destination path for an uploaded file. */

@@ -47,8 +47,10 @@ export const Route = createFileRoute("/api/admin/upload")({
   server: {
     handlers: {
       GET: async () => {
-        const { blobConfigured } = await import("@/lib/blob.server");
-        return json({ ok: true, blob: blobConfigured() });
+        const { blobConfigured, probeStoreAccess } = await import("@/lib/blob.server");
+        if (!blobConfigured()) return json({ ok: true, blob: false, access: "unknown" });
+        const access = await probeStoreAccess();
+        return json({ ok: true, blob: true, access });
       },
 
       POST: async ({ request }) => {
@@ -67,11 +69,22 @@ export const Route = createFileRoute("/api/admin/upload")({
           return json({ error: "Type de média inconnu." }, 400);
         }
 
-        const { blobConfigured, createUploadToken, uploadPathname } =
+        const { blobConfigured, createUploadToken, uploadPathname, probeStoreAccess } =
           await import("@/lib/blob.server");
         if (!blobConfigured()) {
           return json(
             { error: "Stockage Vercel Blob non configuré sur ce projet." },
+            503,
+          );
+        }
+
+        const access = await probeStoreAccess();
+        if (access === "private") {
+          return json(
+            {
+              error:
+                "Le store Vercel Blob est en accès privé : les images du catalogue doivent être publiques. Créez un store public (projet > Storage > Create Storage > Blob > Public), puis reconnectez-le au projet.",
+            },
             503,
           );
         }

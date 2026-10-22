@@ -21,7 +21,8 @@ export async function uploadMedia(
   kind: UploadKind,
   file: File,
   onUploadProgress?: (percentage: number) => void,
-): Promise<{ url: string; pathname: string }> {  const res = await fetch(UPLOAD_API, {
+): Promise<{ url: string; pathname: string }> {
+  const res = await fetch(UPLOAD_API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
