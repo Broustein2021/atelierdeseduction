@@ -10,7 +10,7 @@ import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { Shell } from "@/components/layout/Shell";
 import { NotFound } from "@/components/not-found";
 import appCss from "../styles.css?url";
-const APP_NAME = "L'Atelier de la Séduction";
+const APP_NAME = "L’Atelier de la Séduction";
 
 export const Route = createRootRoute({
   head: () => ({

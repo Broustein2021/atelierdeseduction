@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "L'Atelier de la Séduction — Lingerie féminine à Abidjan" },
+      { title: "L’Atelier de la Séduction — Lingerie féminine à Abidjan" },
       {
         name: "description",
         content:

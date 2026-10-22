@@ -6,7 +6,7 @@ import { generalInquiryText, site, waUrl } from "@/data/site";
 export const Route = createFileRoute("/a-propos")({
   head: () => ({
     meta: [
-      { title: "À propos — L'Atelier de la Séduction, Riviera-Bonoumin" },
+      { title: "À propos — L’Atelier de la Séduction, Riviera-Bonoumin" },
       {
         name: "description",
         content:

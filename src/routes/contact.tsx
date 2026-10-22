@@ -7,7 +7,7 @@ import { generalInquiryText, site, waUrl } from "@/data/site";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact & boutique — L'Atelier de la Séduction, Abidjan" },
+      { title: "Contact & boutique — L’Atelier de la Séduction, Abidjan" },
       {
         name: "description",
         content:

@@ -38,7 +38,7 @@ export const Route = createFileRoute("/produit/$slug")({
   head: ({ loaderData }) => {
     const product = loaderData?.product;
     if (!product) return {};
-    const title = `${product.name} — L'Atelier de la Séduction`;
+    const title = `${product.name} — L’Atelier de la Séduction`;
     const description =
       product.short ||
       `${product.name}, ${categoryLabel[product.category] ?? "pièce de lingerie"} à ${formatCfa(product.price)}. Photos sans retouches, commande sur WhatsApp.`;

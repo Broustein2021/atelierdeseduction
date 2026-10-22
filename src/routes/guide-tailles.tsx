@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/guide-tailles")({
   head: () => ({
     meta: [
-      { title: "Guide des tailles — L'Atelier de la Séduction" },
+      { title: "Guide des tailles — L’Atelier de la Séduction" },
       {
         name: "description",
         content:
