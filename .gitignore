@@ -7,3 +7,5 @@ node_modules/
 
 *.log
 .vercel
+
+scripts/_tmp_*
