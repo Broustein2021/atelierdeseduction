@@ -118,6 +118,8 @@ function ProductPage() {
               <img
                 src={product.images[active] ?? product.images[0]}
                 alt={product.name}
+                fetchPriority="high"
+                decoding="async"
                 className="aspect-portrait w-full object-cover"
               />
             ) : (
@@ -141,6 +143,8 @@ function ProductPage() {
                   <img
                     src={src}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="aspect-square w-full object-cover"
                   />
                 </button>
@@ -161,7 +165,9 @@ function ProductPage() {
                   <video
                     src={src}
                     controls
-                    preload="metadata"
+                    playsInline
+                    preload="none"
+                    poster={product.images[0]}
                     className="aspect-video w-full"
                   >
                     <source src={src} />

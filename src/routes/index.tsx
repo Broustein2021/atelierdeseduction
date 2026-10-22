@@ -4,7 +4,7 @@ import { Logo, Monogram } from "@/components/brand/Logo";
 import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
-import { generalInquiryText, site, waUrl } from "@/data/site";
+import { SITE_URL, generalInquiryText, site, waUrl } from "@/data/site";
 import { getProducts } from "@/lib/products-server";
 
 export const Route = createFileRoute("/")({
@@ -19,6 +19,45 @@ export const Route = createFileRoute("/")({
         name: "description",
         content:
           "Boutique de lingerie et nuisettes à Abidjan, Riviera-Bonoumin. Pièces sans retouches, sélectionnées à la main. Commandez sur WhatsApp, livraison à Abidjan.",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ClothingStore",
+          "@id": `${SITE_URL}/#boutique`,
+          name: site.name,
+          description:
+            "Boutique de lingerie et nuisettes à Abidjan, Riviera-Bonoumin. Pièces sans retouches, commande sur WhatsApp.",
+          url: SITE_URL,
+          image: `${SITE_URL}/og.jpg`,
+          telephone: site.phoneTel,
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: site.addressLine,
+            addressLocality: "Abidjan",
+            addressCountry: "CI",
+          },
+          areaServed: "Abidjan",
+          openingHoursSpecification: [
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: [
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+              ],
+              opens: "10:00",
+              closes: "19:00",
+            },
+          ],
+          sameAs: [site.facebook],
+          hasMap: site.mapLink,
+        }),
       },
     ],
   }),
@@ -43,6 +82,8 @@ function Home() {
         <img
           src="/images/brand/hero.jpg"
           alt="L'Atelier de la Séduction, boutique Riviera-Bonoumin"
+          fetchPriority="high"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover object-[center_20%]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/45 to-ink/25" />
@@ -122,6 +163,8 @@ function Home() {
             <img
               src="/images/products/nuisette-ivoire.jpg"
               alt="Nuisette soie ivoire à l'atelier"
+              loading="lazy"
+              decoding="async"
               className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
