@@ -9,3 +9,5 @@ node_modules/
 .vercel
 
 scripts/_tmp_*
+
+screenshots/
