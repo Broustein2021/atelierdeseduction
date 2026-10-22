@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { categories, colors } from "@/data/products";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { VideoUploader } from "@/components/admin/VideoUploader";
+import { StorageNotice } from "@/components/admin/StorageNotice";
 import {
   deleteProductAction,
   saveProductAction,
@@ -336,6 +337,8 @@ export function ProductForm({ product }: { product?: ProductWithMedia }) {
             ))}
           </div>
         </Section>
+
+        <StorageNotice />
 
         <Section
           title="Images"
