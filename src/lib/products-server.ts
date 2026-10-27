@@ -123,11 +123,29 @@ function toProduct(row: ProductRow): ProductWithMedia {
 
 /** Published products, newest first. */
 export const getProducts = createServerFn({ method: "GET" }).handler(async () => {
-  const sql = await db();
-  const rows = await sql.query<ProductRow>(
-    `${SELECT_PRODUCTS} where p.is_published = true order by p.created_at desc`,
-  );
-  return rows.map(toProduct);
+  try {
+    const sql = await db();
+    const rows = await sql.query<ProductRow>(
+      `${SELECT_PRODUCTS} where p.is_published = true order by p.created_at desc`,
+    );
+    if (rows.length === 0) {
+      const { products } = await import("@/data/products");
+      return products.map((p) => ({
+        ...p,
+        videos: [],
+        cover: null,
+      }));
+    }
+    return rows.map(toProduct);
+  } catch (err) {
+    console.error("[getProducts] falling back to static data:", err);
+    const { products } = await import("@/data/products");
+    return products.map((p) => ({
+      ...p,
+      videos: [],
+      cover: null,
+    }));
+  }
 });
 
 /**
@@ -159,12 +177,19 @@ export async function listSitemapEntries(): Promise<
 export const getProductBySlug = createServerFn({ method: "GET" })
   .validator((slug: string) => slug)
   .handler(async ({ data: slug }) => {
-    const sql = await db();
-    const rows = await sql.query<ProductRow>(
-      `${SELECT_PRODUCTS} where p.slug = $1 and p.is_published = true limit 1`,
-      [slug],
-    );
-    return rows[0] ? toProduct(rows[0]) : null;
+    try {
+      const sql = await db();
+      const rows = await sql.query<ProductRow>(
+        `${SELECT_PRODUCTS} where p.slug = $1 and p.is_published = true limit 1`,
+        [slug],
+      );
+      if (rows[0]) return toProduct(rows[0]);
+    } catch (err) {
+      console.error("[getProductBySlug] falling back to static data:", err);
+    }
+    const { products } = await import("@/data/products");
+    const p = products.find((x) => x.slug === slug);
+    return p ? { ...p, videos: [], cover: null } : null;
   });
 
 /* ------------------------------------------------------------------ */
