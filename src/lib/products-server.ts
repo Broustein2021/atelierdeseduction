@@ -138,7 +138,7 @@ export const getProducts = createServerFn({ method: "GET" }).handler(async () =>
     }
     return rows.map(toProduct);
   } catch (err) {
-    console.error("[getProducts] falling back to static data:", err);
+    console.error("[getProducts] falling back to static data:", (err as any)?.message || err);
     const { products } = await import("@/data/products");
     return products.map((p) => ({
       ...p,
@@ -185,7 +185,7 @@ export const getProductBySlug = createServerFn({ method: "GET" })
       );
       if (rows[0]) return toProduct(rows[0]);
     } catch (err) {
-      console.error("[getProductBySlug] falling back to static data:", err);
+      console.error("[getProductBySlug] falling back to static data:", (err as any)?.message || err);
     }
     const { products } = await import("@/data/products");
     const p = products.find((x) => x.slug === slug);
