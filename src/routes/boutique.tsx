@@ -8,7 +8,7 @@ import {
   type ColorId,
 } from "@/data/products";
 import { cn } from "@/lib/utils";
-import { getProducts } from "@/lib/products-server";
+import { getProductsSafe } from "@/lib/products-server";
 
 type Search = {
   cat?: CategoryId;
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/boutique")({
     nouveau: truthyParam(s.nouveau),
   }),
   loader: async () => {
-    const products = await getProducts();
+    const products = await getProductsSafe();
     return { products };
   },
   head: () => ({

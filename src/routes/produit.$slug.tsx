@@ -10,7 +10,7 @@ import {
   colors,
 } from "@/data/products";
 import { SITE_URL, site } from "@/data/site";
-import { getProductBySlug, getProducts } from "@/lib/products-server";
+import { getProductBySlug, getProductsSafe } from "@/lib/products-server";
 import { formatCfa, cn } from "@/lib/utils";
 
 function toAbsoluteImage(src: string): string {
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/produit/$slug")({
   loader: async ({ params }) => {
     const [product, all] = await Promise.all([
       getProductBySlug({ data: params.slug }),
-      getProducts(),
+      getProductsSafe(),
     ]);
     if (!product) throw notFound();
     const related = [...all]

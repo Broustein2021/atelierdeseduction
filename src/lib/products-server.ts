@@ -148,6 +148,23 @@ export const getProducts = createServerFn({ method: "GET" }).handler(async () =>
   }
 });
 
+/** Published products, newest first (server loader fallback). */
+export async function getProductsSafe() {
+  try {
+    const { getProducts } = await import("@/lib/products-server");
+    const res = await (getProducts as any)();
+    if (Array.isArray(res) && res.length > 0) return res;
+  } catch (err) {
+    console.error("[getProductsSafe] error:", (err as any)?.message || err);
+  }
+  const { products } = await import("@/data/products");
+  return products.map((p: any) => ({
+    ...p,
+    videos: [],
+    cover: null,
+  }));
+}
+
 /**
  * Published product slugs + last update, for `/sitemap.xml`.
  *

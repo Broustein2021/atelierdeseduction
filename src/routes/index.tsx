@@ -5,11 +5,11 @@ import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { SITE_URL, generalInquiryText, site, waUrl } from "@/data/site";
-import { getProducts } from "@/lib/products-server";
+import { getProductsSafe } from "@/lib/products-server";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const products = await getProducts();
+    const products = await getProductsSafe();
     return { products };
   },
   head: () => ({
